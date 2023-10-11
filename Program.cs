@@ -23,16 +23,30 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 
-app.MapIdentityApi<User>();
-
 var api = app.MapGroup("/api");
+
+api.MapIdentityApi<User>();
+
+var users = api.MapGroup("/users");
+
+users.MapGet("/", async (AppDbContext db) =>
+{
+    var users = await db.Users.ToListAsync();
+    var dto = users.Select(u => new
+    {
+        u.Id,
+        u.Email,
+    });
+    return dto;
+}).RequireAuthorization();
+
 var messages = api.MapGroup("/messages").RequireAuthorization();
 
 messages.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
 {
     var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
     var messages = await db.Messages
-        .Where(m => m.ReceiverId == userId)
+        .Where(m => m.SenderId == userId || m.ReceiverId == userId)
         .OrderByDescending(m => m.CreatedAt)
         .GroupBy(m => m.ReceiverId)
         .ToListAsync();
@@ -44,7 +58,11 @@ messages.MapGet("/{id}", async (AppDbContext db, string id, ClaimsPrincipal user
 {
     var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
     var messages = await db.Messages
-        .Where(m => m.ReceiverId == userId && m.SenderId == id)
+        .Where(
+            m =>
+                (m.ReceiverId == userId && m.SenderId == id) ||
+                (m.ReceiverId == id && m.SenderId == userId)
+        )
         .OrderByDescending(m => m.CreatedAt)
         .ToListAsync();
 
@@ -55,7 +73,14 @@ messages.MapPost("/", async (AppDbContext db, Message message, ClaimsPrincipal u
 {
     var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
     message.SenderId = userId!;
-    message.ReceiverId = message.ReceiverId;
+    if (message.ReceiverId == message.SenderId)
+    {
+        return Results.BadRequest("You can't send message to yourself");
+    }
+    if (!await db.Users.AnyAsync(u => u.Id == message.ReceiverId))
+    {
+        return Results.BadRequest("Receiver not found");
+    }
     await db.Messages.AddAsync(message);
     await db.SaveChangesAsync();
 
