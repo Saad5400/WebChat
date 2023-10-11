@@ -122,3 +122,6 @@ src/.vs/config/applicationhost.config
 *.db
 *.db-shm
 *.db-wal
+
+# Svelte build
+_app

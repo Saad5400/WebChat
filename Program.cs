@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebCha.Data;
 using WebChat.Models;
@@ -19,6 +20,8 @@ builder.Services.AddIdentityCore<User>()
     .AddApiEndpoints();
 
 var app = builder.Build();
+
+app.UseStaticFiles();
 
 app.MapIdentityApi<User>();
 
@@ -58,5 +61,9 @@ messages.MapPost("/", async (AppDbContext db, Message message, ClaimsPrincipal u
 
     return Results.Created($"/api/messages/{message.Id}", message);
 });
+
+// return index.html
+// app.MapGet("/", () => Results.Content(File.ReadAllText("wwwroot/index.html"), "text/html"));
+app.MapFallbackToFile("index.html");
 
 app.Run();
