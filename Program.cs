@@ -55,12 +55,11 @@ auth.MapIdentityApi<User>();
 users.MapGet("/", async (AppDbContext db) =>
 {
     var users = await db.Users.ToListAsync();
-    var dto = users.Select(u => new
+    return users.Select(u => new
     {
         u.Id,
         u.Email,
     });
-    return dto;
 }).RequireAuthorization();
 
 messages.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
@@ -69,7 +68,26 @@ messages.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
     var messages = await db.Messages
         .Where(m => m.SenderId == userId || m.ReceiverId == userId)
         .OrderByDescending(m => m.CreatedAt)
-        .GroupBy(m => m.ReceiverId)
+        .Select(m => new
+        {
+            m.Id,
+            m.Text,
+            m.SenderId,
+            m.ReceiverId,
+            m.CreatedAt,
+            m.IsRead,
+            Sender = new
+            {
+                m.Sender.Id,
+                m.Sender.Email,
+            },
+            Receiver = new
+            {
+                m.Receiver.Id,
+                m.Receiver.Email,
+            }
+        })
+        .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
         .ToListAsync();
 
     return messages;

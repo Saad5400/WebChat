@@ -4,5 +4,5 @@ namespace WebChat.Models;
 
 public class User : IdentityUser
 {
-    
+
 }
