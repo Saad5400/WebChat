@@ -11,6 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Default"));
 });
 
+// Auth
 builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
 builder.Services.AddAuthorization();
 
@@ -18,15 +19,38 @@ builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddApiEndpoints();
 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 0;
+});
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.AllowAnyOrigin();
+    });
+});
+
 var app = builder.Build();
 
+app.UseCors();
 app.UseStaticFiles();
 
 var api = app.MapGroup("/api");
+var auth = api.MapGroup("/auth");
+var users = api.MapGroup("/users").RequireAuthorization();
+var messages = api.MapGroup("/messages").RequireAuthorization();
 
-api.MapIdentityApi<User>();
-
-var users = api.MapGroup("/users");
+auth.MapIdentityApi<User>();
 
 users.MapGet("/", async (AppDbContext db) =>
 {
@@ -38,8 +62,6 @@ users.MapGet("/", async (AppDbContext db) =>
     });
     return dto;
 }).RequireAuthorization();
-
-var messages = api.MapGroup("/messages").RequireAuthorization();
 
 messages.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
 {
