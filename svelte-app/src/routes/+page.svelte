@@ -1,7 +1,9 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import register from "$lib/api/auth/register";
     import authStore from "$lib/stores/authStore.store.";
     import token from "$lib/stores/authStore.store.";
+    import { onDestroy } from "svelte";
     import isEmail from "validator/es/lib/isEmail";
     import isStrongPassword from "validator/es/lib/isStrongPassword";
     // import authStore from "$lib/stores/auth.store.";
@@ -65,10 +67,13 @@
         }
     };
 
-    authStore.subscribe(({ accessToken, refreshToken }) => {
+    const unSub = authStore.subscribe(({ accessToken, refreshToken }) => {
         if (accessToken) {
-            window.location.href = "/chats";
+            goto("/chats");
         }
+    });
+    onDestroy(() => {
+        unSub();
     });
 </script>
 
