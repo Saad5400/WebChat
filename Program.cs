@@ -71,8 +71,18 @@ chats.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
         .GroupBy(m => m.ReceiverId == userId ? m.SenderId : m.ReceiverId)
         .Select(g => new
         {
-            UserId = g.Key,
-            LastMessage = g.OrderByDescending(m => m.CreatedAt).FirstOrDefault(),
+            User = db.Users.Select(u => new {
+                u.Id,
+                u.Email,
+            }).FirstOrDefault(u => u.Id == g.Key),
+            LastMessage = g.Select(m => new {
+                m.Id,
+                m.Text,
+                m.CreatedAt,
+                m.IsRead,
+                m.SenderId,
+                m.ReceiverId,
+            }).OrderByDescending(m => m.CreatedAt).FirstOrDefault(),
         })
         .ToListAsync();
     return chats;

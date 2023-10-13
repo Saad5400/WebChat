@@ -8,7 +8,17 @@
     }
 
     const chats = fetchChats();
-
-    console.log(chats);
 </script>
 
+<h1>Chats</h1>
+
+{#await chats}
+    <p>loading...</p>
+{:then chats}
+    {#each chats as chat}
+        {chat.user.email}:
+        {chat.lastMessage.text}
+    {/each}
+{:catch error}
+    <p>error: {error.message}</p>
+{/await}
