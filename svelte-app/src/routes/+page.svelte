@@ -67,7 +67,7 @@
 
     authStore.subscribe(({ accessToken, refreshToken }) => {
         if (accessToken) {
-            window.location.href = "/app";
+            window.location.href = "/chats";
         }
     });
 </script>

@@ -49,6 +49,7 @@ var api = app.MapGroup("/api");
 var auth = api.MapGroup("/auth");
 var users = api.MapGroup("/users").RequireAuthorization();
 var messages = api.MapGroup("/messages").RequireAuthorization();
+var chats = api.MapGroup("/chats").RequireAuthorization();
 
 auth.MapIdentityApi<User>();
 
@@ -62,35 +63,19 @@ users.MapGet("/", async (AppDbContext db) =>
     });
 }).RequireAuthorization();
 
-messages.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
+chats.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
 {
     var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-    var messages = await db.Messages
-        .Where(m => m.SenderId == userId || m.ReceiverId == userId)
-        .OrderByDescending(m => m.CreatedAt)
-        .Select(m => new
+    var chats = await db.Messages
+        .Where(m => m.ReceiverId == userId || m.SenderId == userId)
+        .GroupBy(m => m.ReceiverId == userId ? m.SenderId : m.ReceiverId)
+        .Select(g => new
         {
-            m.Id,
-            m.Text,
-            m.SenderId,
-            m.ReceiverId,
-            m.CreatedAt,
-            m.IsRead,
-            Sender = new
-            {
-                m.Sender.Id,
-                m.Sender.Email,
-            },
-            Receiver = new
-            {
-                m.Receiver.Id,
-                m.Receiver.Email,
-            }
+            UserId = g.Key,
+            LastMessage = g.OrderByDescending(m => m.CreatedAt).FirstOrDefault(),
         })
-        .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
         .ToListAsync();
-
-    return messages;
+    return chats;
 });
 
 messages.MapGet("/{id}", async (AppDbContext db, string id, ClaimsPrincipal user) =>

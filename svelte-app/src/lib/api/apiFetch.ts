@@ -1,6 +1,7 @@
 import { PUBLIC_API_URL } from "$env/static/public";
 import authStore from "$lib/stores/authStore.store.";
 import { get } from "svelte/store";
+import refresh from "./auth/refresh";
 
 export default async function apiFetch(path: string, options: RequestInit = {}) {
     options = {
@@ -13,5 +14,16 @@ export default async function apiFetch(path: string, options: RequestInit = {}) 
             ...options.headers,
         },
     };
-    return fetch(PUBLIC_API_URL + path, options);
+    try {
+        const res = await fetch(PUBLIC_API_URL + path, options);
+        return res;
+    } catch (err) {
+        await refresh();
+        return apiFetch(path, options);
+    }
+    // if (res.status === 401) {
+    //     await refresh();
+    //     return apiFetch(path, options);
+    // }
+    // return res;
 }
