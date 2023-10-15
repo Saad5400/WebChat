@@ -3,7 +3,7 @@
     import register from "$lib/api/auth/register";
     import authStore from "$lib/stores/authStore.store.";
     import token from "$lib/stores/authStore.store.";
-    import { onDestroy } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import isEmail from "validator/es/lib/isEmail";
     import isStrongPassword from "validator/es/lib/isStrongPassword";
     // import authStore from "$lib/stores/auth.store.";
@@ -30,19 +30,22 @@
     let landingElement: HTMLDivElement;
 
     let scrolling = false;
+    const minDelta = 1;
 
     const scrollToRegister = (y: number) => {
         let dy = lastY - y;
         lastY = y;
 
-        if (!scrolling && (dy < -10 || dy > 10)) {
+        if (!scrolling && (dy < -minDelta || dy > minDelta)) {
             scrolling = true;
+
             setTimeout(() => {
                 scrolling = false;
-            }, 500);
-            if (dy < -10)
+            }, 400);
+
+            if (dy < -minDelta)
                 scrollTo(0, registerElement.getBoundingClientRect().top + y);
-            if (dy > 10)
+            if (dy > minDelta)
                 scrollTo(0, landingElement.getBoundingClientRect().top + y);
         }
     };
@@ -78,6 +81,11 @@
 </script>
 
 <svelte:window bind:scrollY={y} />
+<svelte:document
+    on:scroll={(e) => {
+        if (scrolling) e.preventDefault();
+    }}
+/>
 
 <div
     class="flex items-center w-full min-h-[100dvh] max-w-xs sm:max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto"
