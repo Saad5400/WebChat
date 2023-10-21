@@ -3,7 +3,9 @@
 	import { Avatar, ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
 	import { onMount } from "svelte";
 
-	const chats = fetchChats();
+	fetchChats().then((chats) => {
+		console.log(chats);
+	});
 
 	interface Person {
 		id: number;
@@ -18,6 +20,19 @@
 		timestamp: string;
 		message: string;
 		color: string;
+	}
+	interface User {
+		id: number;
+		email: string;
+	}
+	interface Message {
+		id: number;
+		text: string;
+		timestamp: string;
+	}
+	interface Chat {
+		user: User;
+		lastMessage: Message;
 	}
 
 	let elemChat: HTMLElement;
