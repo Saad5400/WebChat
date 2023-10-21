@@ -3,15 +3,15 @@ import authStore from "$lib/stores/authStore.store.";
 import { get } from "svelte/store";
 import refresh from "./auth/refresh";
 
-export default async function apiFetch(path: string, options: RequestInit = {}) {
+export default async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
     options = {
         ...options,
         headers: {
+            ...options.headers,
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Access-Control-Allow-Origin": "*",
             "Authorization": `Bearer ${get(authStore)?.accessToken}`,
-            ...options.headers,
         },
     };
     try {
@@ -21,9 +21,4 @@ export default async function apiFetch(path: string, options: RequestInit = {}) 
         await refresh();
         return apiFetch(path, options);
     }
-    // if (res.status === 401) {
-    //     await refresh();
-    //     return apiFetch(path, options);
-    // }
-    // return res;
 }

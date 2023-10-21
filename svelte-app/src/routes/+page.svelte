@@ -2,7 +2,6 @@
     import { goto } from "$app/navigation";
     import register from "$lib/api/auth/register";
     import authStore from "$lib/stores/authStore.store.";
-    import token from "$lib/stores/authStore.store.";
     import { onDestroy, onMount } from "svelte";
     import isEmail from "validator/es/lib/isEmail";
     import isStrongPassword from "validator/es/lib/isStrongPassword";

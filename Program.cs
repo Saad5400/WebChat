@@ -13,7 +13,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 // Auth
-builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
+builder.Services.AddAuthentication()
+    .AddBearerToken(IdentityConstants.BearerScheme, options =>
+    {
+        // options.BearerTokenExpiration = TimeSpan.FromSeconds(10);
+        // options.RefreshTokenExpiration = TimeSpan.FromSeconds(60);
+    });
 builder.Services.AddAuthorization();
 
 builder.Services.AddIdentityCore<User>()

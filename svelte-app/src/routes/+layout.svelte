@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { ProgressBar, autoModeWatcher } from "@skeletonlabs/skeleton";
 	import { navigating } from "$app/stores";
-	// import authStore from "$lib/stores/authStore.store.";
+	import authStore from "$lib/stores/authStore.store.";
 	import "../app.postcss";
+	import { get } from "svelte/store";
 
 	// authStore.subscribe((token) => {
 	// 	console.log("authStore", token);

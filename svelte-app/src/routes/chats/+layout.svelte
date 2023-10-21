@@ -1,17 +1,12 @@
 <script lang="ts">
 	import fetchChats from "$lib/api/chats/chats";
+	import searchUsers from "$lib/api/users/search";
+	import useDebounce from "$lib/hooks/useDebounce";
+    import authStore from "$lib/stores/authStore.store.";
 	import { Avatar, ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
 	import { onMount } from "svelte";
+    import { get } from "svelte/store";
 
-	fetchChats().then((chats) => {
-		console.log(chats);
-	});
-
-	interface Person {
-		id: number;
-		avatar: number;
-		name: string;
-	}
 	interface MessageFeed {
 		id: number;
 		host: boolean;
@@ -21,35 +16,14 @@
 		message: string;
 		color: string;
 	}
-	interface User {
-		id: number;
-		email: string;
-	}
-	interface Message {
-		id: number;
-		text: string;
-		timestamp: string;
-	}
-	interface Chat {
-		user: User;
-		lastMessage: Message;
-	}
 
 	let elemChat: HTMLElement;
 	let elemChatContent: HTMLElement;
 
-	const lorem = "F SFM KMGFKDN GKM GKFD GKMFD GKMDFKGMK MFDKG";
-
 	// Navigation List
-	const people: Person[] = [
-		{ id: 0, avatar: 14, name: "Michael" },
-		{ id: 1, avatar: 40, name: "Janet" },
-		{ id: 2, avatar: 31, name: "Susan" },
-		{ id: 3, avatar: 56, name: "Joey" },
-		{ id: 4, avatar: 24, name: "Lara" },
-		{ id: 5, avatar: 9, name: "Melissa" },
-	];
-	let currentPerson: Person = people[0];
+	let currentChat: Chat;
+
+	const lorem = "F SFM KMGFKDN GKM GKFD GKMFD GKMDFKGMK MFDKG";
 
 	// Messages
 	let messageFeed: MessageFeed[] = [
@@ -145,23 +119,44 @@
 		scrollChatBottom();
 	}
 
+	let searchString = "";
+	let chats: Chat[] = [];
+	let searchChats: Chat[] = [];
+
+	fetchChats().then((chats) => {
+		console.log(chats);
+	});
+
 	onMount(() => {
 		setMaxChatHeight();
+	});
+
+	const searchDebounce = useDebounce(500, () => {
+		searchChats = chats.filter((chat) => {
+			return chat.user.email.includes(searchString);
+		});
+		if (searchString.length < 3) return;
+		const res = searchUsers(searchString);
+		res.then((users: User[]) => {
+			for (const user of users) {
+				searchChats = [
+					...searchChats,
+					{
+						user,
+						lastMessage: {
+							id: 0,
+							text: "",
+							timestamp: "",
+						},
+					},
+				];
+			}
+			console.log(searchChats);
+		});
 	});
 </script>
 
 <svelte:window on:resize={setMaxChatHeight} />
-
-<!-- {#await chats}
-    <p>loading...</p>
-{:then chats}
-    {#each chats as chat}
-        {chat.user.email}:
-        {chat.lastMessage.text}
-    {/each}
-{:catch error}
-    <p>error: {error.message}</p>
-{/await} -->
 
 <div class="chat w-full min-h-screen grid grid-cols-1 lg:grid-cols-[30%_1fr]">
 	<!-- Navigation -->
@@ -170,25 +165,31 @@
 	>
 		<!-- Header -->
 		<header class="border-b border-surface-500/30 p-4">
-			<input class="input" type="search" placeholder="Search..." />
+			<input
+				class="input"
+				type="search"
+				placeholder="Search..."
+				bind:value={searchString}
+				on:input={searchDebounce}
+			/>
 		</header>
 		<!-- List -->
 		<div class="p-4 space-y-4 overflow-y-auto">
-			<small class="opacity-50">Contacts</small>
+			<small class="opacity-50"> Contacts </small>
 			<ListBox active="variant-filled-primary">
-				{#each people as person}
+				{#each searchChats as chat}
 					<ListBoxItem
-						bind:group={currentPerson}
+						bind:group={currentChat}
 						name="people"
-						value={person}
+						value={chat.user.id}
 					>
-						<svelte:fragment slot="lead">
+						<!-- <svelte:fragment slot="lead">
 							<Avatar
 								src="https://i.pravatar.cc/?img={person.avatar}"
 								width="w-8"
 							/>
-						</svelte:fragment>
-						{person.name}
+						</svelte:fragment> -->
+						{chat.user.email}
 					</ListBoxItem>
 				{/each}
 			</ListBox>

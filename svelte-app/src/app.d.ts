@@ -9,3 +9,17 @@ declare namespace App {
 }
 
 declare module 'validator/es/lib/*';
+
+interface User {
+	id: number;
+	email: string;
+}
+interface Message {
+	id: number;
+	text: string;
+	timestamp: string;
+}
+interface Chat {
+	user: User;
+	lastMessage: Message;
+}
