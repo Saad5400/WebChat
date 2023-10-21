@@ -7,17 +7,19 @@
 		console.log(chats);
 	});
 
-	interface User {
-		id: string;
-		email: string;
+	interface Person {
+		id: number;
+		avatar: number;
+		name: string;
 	}
-	
-	interface Message {
-		id: string;
+	interface MessageFeed {
+		id: number;
 		host: boolean;
-		sender: User;
+		avatar: number;
+		name: string;
 		timestamp: string;
-		content: string;
+		message: string;
+		color: string;
 	}
 	interface User {
 		id: number;
@@ -38,8 +40,19 @@
 
 	const lorem = "F SFM KMGFKDN GKM GKFD GKMFD GKMDFKGMK MFDKG";
 
+	// Navigation List
+	const people: Person[] = [
+		{ id: 0, avatar: 14, name: "Michael" },
+		{ id: 1, avatar: 40, name: "Janet" },
+		{ id: 2, avatar: 31, name: "Susan" },
+		{ id: 3, avatar: 56, name: "Joey" },
+		{ id: 4, avatar: 24, name: "Lara" },
+		{ id: 5, avatar: 9, name: "Melissa" },
+	];
+	let currentPerson: Person = people[0];
+
 	// Messages
-	let messageFeed: Message[] = [
+	let messageFeed: MessageFeed[] = [
 		{
 			id: 0,
 			host: true,
@@ -175,7 +188,7 @@
 								width="w-8"
 							/>
 						</svelte:fragment>
-						{person.email}
+						{person.name}
 					</ListBoxItem>
 				{/each}
 			</ListBox>
