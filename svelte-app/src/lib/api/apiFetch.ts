@@ -3,7 +3,7 @@ import authStore from "$lib/stores/authStore.store.";
 import { get } from "svelte/store";
 import refresh from "./auth/refresh";
 
-export default async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
+export default async function apiFetch(path: string, options: RequestInit = {}, tryRefresh = true): Promise<Response> {
     options = {
         ...options,
         headers: {
@@ -18,7 +18,9 @@ export default async function apiFetch(path: string, options: RequestInit = {}):
         const res = await fetch(PUBLIC_API_URL + path, options);
         return res;
     } catch (err) {
+        if (!tryRefresh) throw err;
+        
         await refresh();
-        return apiFetch(path, options);
+        return apiFetch(path, options, false);
     }
 }
