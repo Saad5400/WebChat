@@ -3,21 +3,21 @@
 	import { Avatar, ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
 	import { onMount } from "svelte";
 
-	const chats = fetchChats();
+	fetchChats().then((chats) => {
+		console.log(chats);
+	});
 
-	interface Person {
-		id: number;
-		avatar: number;
-		name: string;
+	interface User {
+		id: string;
+		email: string;
 	}
-	interface MessageFeed {
-		id: number;
+	
+	interface Message {
+		id: string;
 		host: boolean;
-		avatar: number;
-		name: string;
+		sender: User;
 		timestamp: string;
-		message: string;
-		color: string;
+		content: string;
 	}
 
 	let elemChat: HTMLElement;
@@ -25,19 +25,8 @@
 
 	const lorem = "F SFM KMGFKDN GKM GKFD GKMFD GKMDFKGMK MFDKG";
 
-	// Navigation List
-	const people: Person[] = [
-		{ id: 0, avatar: 14, name: "Michael" },
-		{ id: 1, avatar: 40, name: "Janet" },
-		{ id: 2, avatar: 31, name: "Susan" },
-		{ id: 3, avatar: 56, name: "Joey" },
-		{ id: 4, avatar: 24, name: "Lara" },
-		{ id: 5, avatar: 9, name: "Melissa" },
-	];
-	let currentPerson: Person = people[0];
-
 	// Messages
-	let messageFeed: MessageFeed[] = [
+	let messageFeed: Message[] = [
 		{
 			id: 0,
 			host: true,
@@ -173,7 +162,7 @@
 								width="w-8"
 							/>
 						</svelte:fragment>
-						{person.name}
+						{person.email}
 					</ListBoxItem>
 				{/each}
 			</ListBox>

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebCha.Data;
 using WebChat.Models;
@@ -61,7 +62,16 @@ users.MapGet("/", async (AppDbContext db) =>
         u.Id,
         u.Email,
     });
-}).RequireAuthorization();
+});
+users.MapPost("/search", async (AppDbContext db, [FromBody] string q) =>
+{
+    var users = await db.Users.Where(u => u.Email!.Contains(q)).ToListAsync();
+    return users.Select(u => new
+    {
+        u.Id,
+        u.Email,
+    });
+});
 
 chats.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
 {
@@ -71,11 +81,13 @@ chats.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
         .GroupBy(m => m.ReceiverId == userId ? m.SenderId : m.ReceiverId)
         .Select(g => new
         {
-            User = db.Users.Select(u => new {
+            User = db.Users.Select(u => new
+            {
                 u.Id,
                 u.Email,
             }).FirstOrDefault(u => u.Id == g.Key),
-            LastMessage = g.Select(m => new {
+            LastMessage = g.Select(m => new
+            {
                 m.Id,
                 m.Text,
                 m.CreatedAt,
