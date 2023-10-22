@@ -59,15 +59,28 @@ var chats = api.MapGroup("/chats").RequireAuthorization();
 
 auth.MapIdentityApi<User>();
 
-users.MapGet("/", async (AppDbContext db) =>
+users.MapGet("/", async (AppDbContext db, [FromQuery] string? email, [FromQuery] string? id) =>
 {
-    var users = await db.Users.ToListAsync();
-    return users.Select(u => new
+    email ??= "";
+    id ??= "";
+
+    if (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(id))
     {
-        u.Id,
-        u.Email,
-    });
+        return Results.BadRequest("Email or Id is required");
+    }
+
+    var users = await db.Users
+        .Where(u => u.Email == email || u.Id == id)
+        .Select(u => new
+        {
+            u.Id,
+            u.Email,
+        })
+        .ToListAsync();
+
+    return Results.Ok(users);
 });
+
 users.MapPost("/search", async (AppDbContext db, [FromBody] string q) =>
 {
     var users = await db.Users.Where(u => u.Email!.Contains(q)).ToListAsync();

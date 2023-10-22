@@ -11,14 +11,15 @@ declare namespace App {
 declare module 'validator/es/lib/*';
 
 interface User {
-	id: number?;
+	id: string;
 	email: string;
 }
 interface Message {
-	id: string;
-	host?: boolean;
 	text: string;
 	timestamp: string;
+	id?: string;
+	host?: boolean;
+	receiverId?: string;
 }
 interface Chat {
 	user: User;

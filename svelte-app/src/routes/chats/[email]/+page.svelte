@@ -1,7 +1,10 @@
 <script lang="ts">
-    import { Avatar } from "@skeletonlabs/skeleton";
     import { onMount } from "svelte";
     import { page } from "$app/stores";
+    import getUsers from "$lib/api/users/users";
+    import { goto } from "$app/navigation";
+    import postNewMessage from "$lib/api/messages/new";
+    
 
     let elemChat: HTMLElement;
     let elemChatContent: HTMLElement;
@@ -12,10 +15,11 @@
 
     page.subscribe((value) => {
         currentMessage = "";
-        currentUser = {
-            id: null,
-            email: value.params.email,
-        };
+        getUsers(value.params.email, "").then((users) => {
+            currentUser = users[0];
+        }).catch((error) => {
+            goto("/chats");
+        });
     });
 
     // For some reason, eslint thinks ScrollBehavior is undefined...
@@ -34,11 +38,13 @@
 
     function addMessage(): void {
         const newMessage: Message = {
-            id: '',
+            id: "",
             host: true,
             timestamp: `Today @ ${getCurrentTimestamp()}`,
             text: currentMessage,
+            receiverId: currentUser.id,
         };
+        postNewMessage(newMessage);
         // Update the message feed
         messageFeed = [...messageFeed, newMessage];
         // Clear prompt
