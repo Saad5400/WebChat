@@ -4,8 +4,6 @@
 	import searchUsers from "$lib/api/users/search";
 	import useDebounce from "$lib/hooks/useDebounce";
 	import { ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
-	import { page } from "$app/stores";
-	import { onMount } from "svelte";
     import authStore from "$lib/stores/authStore.store.";
     import { get } from "svelte/store";
 
@@ -45,7 +43,7 @@
 		const users: User[] = await searchUsers(searchString);
 		for (const user of users) {
 			if (searchChats.find((chat) => chat.user.email === user.email)) continue;
-			if (user.id == get(authStore).id) continue;
+			if (user.id == get(authStore)!.id) continue;
 
 			searchChats = [
 				...searchChats,

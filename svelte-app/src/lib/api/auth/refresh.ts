@@ -15,11 +15,11 @@ export default async function refresh() {
         method: "POST",
     });
     if (res.status === 401) {
-        authStore.set({ accessToken: "", refreshToken: "", email: "", id: "" });
+        authStore.set(null);
         goto("/");
     }
     const authData = await res.json();
-    const storeData = get(authStore);
+    const storeData = get(authStore)!;
     authStore.set({
         accessToken: authData.accessToken,
         refreshToken: authData.refreshToken,

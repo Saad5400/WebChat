@@ -68,8 +68,6 @@
             authStore.set({
                 accessToken: authData.accessToken,
                 refreshToken: authData.refreshToken,
-                id: "",
-                email: "",
             });
 
             const userRes = await getUsers(email);
@@ -92,8 +90,8 @@
         }
     };
 
-    const unSub = authStore.subscribe(({ accessToken, refreshToken }) => {
-        if (accessToken) {
+    const unSub = authStore.subscribe((store) => {
+        if (store) {
             goto("/chats");
         }
     });
