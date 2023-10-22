@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-	import fetchChats from "$lib/api/chats/chats";
+	import { goto } from "$app/navigation";
+	import fetchChats from "$lib/api/chats/get";
 	import searchUsers from "$lib/api/users/search";
 	import useDebounce from "$lib/hooks/useDebounce";
 	import { ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
@@ -18,10 +18,10 @@
 
 	let searchString = "";
 	let chats: Chat[] = [];
-	let searchChats: Chat[] = [];
+	$: searchChats = chats;
 
-	fetchChats().then((chats) => {
-		console.log(chats);
+	fetchChats().then((data) => {
+		chats = data;
 	});
 
 	const searchDebounce = useDebounce(500, () => {
@@ -32,6 +32,8 @@
 		const res = searchUsers(searchString);
 		res.then((users: User[]) => {
 			for (const user of users) {
+				if (searchChats.find((chat) => chat.user.email === user.email))
+					continue;
 				searchChats = [
 					...searchChats,
 					{
@@ -44,7 +46,6 @@
 					},
 				];
 			}
-			console.log(searchChats);
 		});
 	});
 </script>
@@ -81,6 +82,9 @@
 							/>
 						</svelte:fragment> -->
 						{chat.user.email}
+						<small class="opacity-50 text-xs m-0 ms-2 p-0">
+							{chat.lastMessage.text.slice(0, 20) + ( chat.lastMessage.text.length > 20 ? " .." : "")}
+						</small>
 					</ListBoxItem>
 				{/each}
 			</ListBox>
@@ -88,5 +92,5 @@
 		<!-- Footer -->
 		<!-- <footer class="border-t border-surface-500/30 p-4">(footer)</footer> -->
 	</div>
-		<slot />
+	<slot />
 </div>

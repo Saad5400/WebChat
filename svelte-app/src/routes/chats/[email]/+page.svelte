@@ -1,9 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { page } from "$app/stores";
-    import getUsers from "$lib/api/users/users";
+    import getUsers from "$lib/api/users/get";
     import { goto } from "$app/navigation";
-    import postNewMessage from "$lib/api/messages/new";
+    import postNewMessage from "$lib/api/messages/post";
     
 
     let elemChat: HTMLElement;
@@ -15,11 +15,14 @@
 
     page.subscribe((value) => {
         currentMessage = "";
+
         getUsers(value.params.email, "").then((users) => {
             currentUser = users[0];
         }).catch((error) => {
             goto("/chats");
         });
+
+
     });
 
     // For some reason, eslint thinks ScrollBehavior is undefined...
