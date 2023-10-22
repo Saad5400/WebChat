@@ -112,7 +112,7 @@ chats.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
                 m.IsRead,
                 m.SenderId,
                 m.ReceiverId,
-            }).OrderByDescending(m => m.CreatedAt).FirstOrDefault(),
+            }).OrderBy(m => m.CreatedAt).FirstOrDefault(),
         })
         .ToListAsync();
     return chats;

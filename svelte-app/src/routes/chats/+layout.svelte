@@ -20,15 +20,22 @@
 	let chats: Chat[] = [];
 	$: searchChats = chats;
 
-	fetchChats().then((data) => {
+	async function populateChats() {
+		const data = await fetchChats();
 		chats = data;
-	});
+	}
 
-	const searchDebounce = useDebounce(500, () => {
+	populateChats();
+
+	const searchDebounce = useDebounce(500, async () => {
+
+		await populateChats();
 		searchChats = chats.filter((chat) => {
 			return chat.user.email.includes(searchString);
 		});
+
 		if (searchString.length < 3) return;
+		
 		const res = searchUsers(searchString);
 		res.then((users: User[]) => {
 			for (const user of users) {
