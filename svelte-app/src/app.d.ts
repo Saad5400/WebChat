@@ -23,3 +23,12 @@ interface Chat {
 	user: User;
 	lastMessage: Message;
 }
+interface MessageFeed {
+	id: number;
+	host: boolean;
+	avatar: number;
+	name: string;
+	timestamp: string;
+	message: string;
+	color: string;
+}
