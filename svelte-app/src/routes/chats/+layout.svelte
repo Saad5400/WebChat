@@ -21,21 +21,25 @@
 	$: searchChats = chats;
 
 	async function populateChats() {
-		const data = await fetchChats();
-		chats = data;
+		const data: Chat[] = await fetchChats();
+		chats = data.sort((a, b) => {
+			return (
+				new Date(b.lastMessage.createdAt!).getTime() -
+				new Date(a.lastMessage.createdAt!).getTime()
+			);
+		});
 	}
 
 	populateChats();
 
 	const searchDebounce = useDebounce(500, async () => {
-
 		await populateChats();
 		searchChats = chats.filter((chat) => {
 			return chat.user.email.includes(searchString);
 		});
 
 		if (searchString.length < 3) return;
-		
+
 		const res = searchUsers(searchString);
 		res.then((users: User[]) => {
 			for (const user of users) {

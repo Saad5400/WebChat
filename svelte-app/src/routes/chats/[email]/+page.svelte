@@ -31,6 +31,8 @@
 
 	page.subscribe(async (value) => {
 		currentMessage = "";
+		currentUser = {} as User;
+		messageFeed = [];
 
 		if (value.params.email) {
 			await populateUser(value.params.email);
