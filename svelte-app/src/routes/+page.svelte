@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import register from "$lib/api/auth/register";
+    import getUsers from "$lib/api/users/get";
     import authStore from "$lib/stores/authStore.store.";
     import { onDestroy, onMount } from "svelte";
     import isEmail from "validator/es/lib/isEmail";
@@ -52,19 +53,41 @@
     $: scrollToRegister(y);
 
     // register
-    const registerSubmit = (e: Event) => {
+    const registerSubmit = async (e: Event) => {
         e.preventDefault();
         if (validEmail && validPassword) {
-            register(email, password).then((res) => {
-                console.log(res);
-                if (res.status === 401) {
-                    errorMessage = "Invalid credentials";
-                } else {
-                    authStore.set({
-                        accessToken: res.accessToken,
-                        refreshToken: res.refreshToken,
-                    });
-                }
+            const authRes = await register(email, password);
+            
+            if (authRes.ok === false) {
+                errorMessage = "Invalid credentials";
+                return;
+            }
+
+            const authData = await authRes.json();
+
+            authStore.set({
+                accessToken: authData.accessToken,
+                refreshToken: authData.refreshToken,
+                id: "",
+                email: "",
+            });
+
+            const userRes = await getUsers(email);
+
+            if (userRes.ok === false) {
+                errorMessage = "Something went wrong";
+                return;
+            }
+
+            const userData: User[] = await userRes.json();
+
+            const user = userData[0];
+
+            authStore.set({
+                accessToken: authData.accessToken,
+                refreshToken: authData.refreshToken,
+                id: user.id,
+                email: user.email,
             });
         }
     };

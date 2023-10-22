@@ -14,7 +14,10 @@
 	let messageFeed: Message[] = [];
 
 	async function populateUser(email: string) {
-		const users = await getUsers(email);
+		let users: User[] = await (await getUsers(email)).json();
+		if (users.length === 0) {
+			goto("/chats");
+		}
 		currentUser = users[0];
 	}
 

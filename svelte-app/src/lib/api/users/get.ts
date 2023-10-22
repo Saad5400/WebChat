@@ -1,8 +1,8 @@
 import apiFetch from "$lib/api/apiFetch";
 
-export default async function users(email = "", id = "") {
-    const res = await apiFetch(`/users?email=${email}&id=${id}`, {
+export default async function getUsers(email = "", id = ""): Promise<Response> {
+    const res: Response = await apiFetch(`/users?email=${email}&id=${id}`, {
         method: "GET"
     });
-    return await res.json();
+    return res;
 }

@@ -11,8 +11,8 @@ using WebCha.Data;
 namespace WebChat.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231011112229_MessagesTable")]
-    partial class MessagesTable
+    [Migration("20231022220246_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -150,8 +150,9 @@ namespace WebChat.Migrations
 
             modelBuilder.Entity("WebChat.Models.Message", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");

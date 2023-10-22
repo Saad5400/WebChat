@@ -6,6 +6,8 @@
 	import { ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
 	import { page } from "$app/stores";
 	import { onMount } from "svelte";
+    import authStore from "$lib/stores/authStore.store.";
+    import { get } from "svelte/store";
 
 	// Navigation List
 	let currentChat: Chat;
@@ -40,22 +42,21 @@
 
 		if (searchString.length < 3) return;
 
-		const res = searchUsers(searchString);
-		res.then((users: User[]) => {
-			for (const user of users) {
-				if (searchChats.find((chat) => chat.user.email === user.email))
-					continue;
-				searchChats = [
-					...searchChats,
-					{
-						user: user,
-						lastMessage: {
-							text: "",
-						},
+		const users: User[] = await searchUsers(searchString);
+		for (const user of users) {
+			if (searchChats.find((chat) => chat.user.email === user.email)) continue;
+			if (user.id == get(authStore).id) continue;
+
+			searchChats = [
+				...searchChats,
+				{
+					user: user,
+					lastMessage: {
+						text: "",
 					},
-				];
-			}
-		});
+				},
+			];
+		}
 	});
 </script>
 

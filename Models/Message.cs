@@ -5,7 +5,7 @@ namespace WebChat.Models;
 public class Message
 {
     [Key]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public int Id { get; set; }
 
     [Required]
     public string Text { get; set; } = null!;
