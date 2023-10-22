@@ -39,9 +39,7 @@
 					{
 						user: user,
 						lastMessage: {
-							id: "",
 							text: "",
-							timestamp: "",
 						},
 					},
 				];
@@ -70,11 +68,7 @@
 			<small class="opacity-50"> Contacts </small>
 			<ListBox active="variant-filled-primary">
 				{#each searchChats as chat}
-					<ListBoxItem
-						bind:group={currentChat}
-						name="people"
-						value={chat}
-					>
+					<ListBoxItem bind:group={currentChat} name="people" value={chat}>
 						<!-- <svelte:fragment slot="lead">
 							<Avatar
 								src="https://i.pravatar.cc/?img={person.avatar}"
@@ -83,7 +77,8 @@
 						</svelte:fragment> -->
 						{chat.user.email}
 						<small class="opacity-50 text-xs m-0 ms-2 p-0">
-							{chat.lastMessage.text.slice(0, 20) + ( chat.lastMessage.text.length > 20 ? " .." : "")}
+							{chat.lastMessage.text.slice(0, 20) +
+								(chat.lastMessage.text.length > 20 ? " .." : "")}
 						</small>
 					</ListBoxItem>
 				{/each}

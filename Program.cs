@@ -127,7 +127,7 @@ messages.MapGet("/{id}", async (AppDbContext db, string id, ClaimsPrincipal user
                 (m.ReceiverId == userId && m.SenderId == id) ||
                 (m.ReceiverId == id && m.SenderId == userId)
         )
-        .OrderByDescending(m => m.CreatedAt)
+        .OrderBy(m => m.CreatedAt)
         .ToListAsync();
 
     return messages;

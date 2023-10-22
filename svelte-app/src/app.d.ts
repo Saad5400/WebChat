@@ -16,10 +16,10 @@ interface User {
 }
 interface Message {
 	text: string;
-	timestamp: string;
-	id?: string;
-	host?: boolean;
+	createdAt?: string;
+	isRead?: boolean;
 	receiverId?: string;
+	senderId?: string;
 }
 interface Chat {
 	user: User;
