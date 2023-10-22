@@ -1,12 +1,20 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
 	import fetchChats from "$lib/api/chats/chats";
 	import searchUsers from "$lib/api/users/search";
 	import useDebounce from "$lib/hooks/useDebounce";
 	import { ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
+	import { page } from "$app/stores";
 	import { onMount } from "svelte";
 
 	// Navigation List
 	let currentChat: Chat;
+
+	$: {
+		if (currentChat) {
+			goto(`/chats/${currentChat.user.email}`);
+		}
+	}
 
 	let searchString = "";
 	let chats: Chat[] = [];
@@ -27,9 +35,9 @@
 				searchChats = [
 					...searchChats,
 					{
-						user,
+						user: user,
 						lastMessage: {
-							id: 0,
+							id: "",
 							text: "",
 							timestamp: "",
 						},
@@ -64,7 +72,7 @@
 					<ListBoxItem
 						bind:group={currentChat}
 						name="people"
-						value={chat.user.id}
+						value={chat}
 					>
 						<!-- <svelte:fragment slot="lead">
 							<Avatar
