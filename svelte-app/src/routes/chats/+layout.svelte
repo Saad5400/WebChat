@@ -79,10 +79,10 @@
 	connection.start();
 </script>
 
-<div class="chat w-full min-h-screen grid grid-cols-1 lg:grid-cols-[30%_1fr]">
+<div class="chat w-full min-h-screen grid grid-cols-1 md:grid-cols-[30%_1fr]">
 	<!-- Navigation -->
 	<div
-		class="hidden lg:grid grid-rows-[auto_1fr_auto] border-r border-surface-500/30"
+		class="hidden md:grid grid-rows-[auto_1fr_auto] border-r border-surface-500/30"
 	>
 		<!-- Header -->
 		<header class="border-b border-surface-500/30 p-4">

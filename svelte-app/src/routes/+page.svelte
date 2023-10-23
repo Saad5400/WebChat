@@ -70,6 +70,7 @@
                 refreshToken: authData.refreshToken,
             });
 
+            console.log(email);
             const userRes = await getUsers(email);
 
             if (userRes.ok === false) {
@@ -80,6 +81,8 @@
             const userData: User[] = await userRes.json();
 
             const user = userData[0];
+
+            console.log(user);
 
             authStore.set({
                 accessToken: authData.accessToken,

@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using WebChat.Data;
 using WebChat.Models;
 
 namespace WebChat;
 
+[Authorize]
 public class ChatHub(AppDbContext db, ILogger<ChatHub> logger): Hub
 {
     private static readonly Dictionary<string, string> _connectedUsers = [];
