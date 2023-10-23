@@ -15,14 +15,14 @@ public class ChatHub(AppDbContext db, ILogger<ChatHub> logger) : Hub
 
     public override Task OnConnectedAsync()
     {
-        _logger.LogInformation("User {UserId} connected", Context.UserIdentifier);
+        // _logger.LogInformation("User {UserId} connected", Context.UserIdentifier);
         _connectedUsers.TryAdd(Context.UserIdentifier!, Context.ConnectionId);
         return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        _logger.LogInformation("User {UserId} disconnected", Context.UserIdentifier);
+        // _logger.LogInformation("User {UserId} disconnected", Context.UserIdentifier);
         if (_connectedUsers.ContainsKey(Context.UserIdentifier!))
         {
             _connectedUsers.Remove(Context.UserIdentifier!);
@@ -32,7 +32,7 @@ public class ChatHub(AppDbContext db, ILogger<ChatHub> logger) : Hub
 
     public async Task SendMessage(Message message)
     {
-        _logger.LogInformation("User {UserId} sent message to {ReceiverId} with text {MessageText}", Context.UserIdentifier, message.ReceiverId, message.Text);
+        // _logger.LogInformation("User {UserId} sent message to {ReceiverId} with text {MessageText}", Context.UserIdentifier, message.ReceiverId, message.Text);
 
         message.SenderId = Context.UserIdentifier!;
         message.CreatedAt = DateTime.UtcNow;

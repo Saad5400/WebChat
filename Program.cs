@@ -179,4 +179,10 @@ messages.MapPost("/", async (AppDbContext db, Message message, ClaimsPrincipal u
 // app.MapGet("/", () => Results.Content(File.ReadAllText("wwwroot/index.html"), "text/html"));
 app.MapFallbackToFile("index.html");
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 app.Run();
