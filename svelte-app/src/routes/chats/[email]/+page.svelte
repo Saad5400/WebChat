@@ -128,8 +128,7 @@
 
 		// on receive message
 		connection.on("ReceiveMessage", (message: Message) => {
-			console.log(message.createdAt);
-			message.createdAt = getTimestamp(message.createdAt);
+			message.createdAt = getTimestamp();
 			addMessage(message);
 		});
 	}
