@@ -4,17 +4,24 @@ import authStore from "$lib/stores/authStore.store.";
 import { get } from "svelte/store";
 
 export default async function refresh() {
-    const res = await fetch(PUBLIC_API_URL + "/auth/refresh", {
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Authorization": `Bearer ${get(authStore)?.accessToken}`,
-        },
-        body: JSON.stringify({ refreshToken: get(authStore)?.refreshToken }),
-        method: "POST",
-    });
-    if (res.status === 401) {
+    let res;
+    try {
+        res = await fetch(PUBLIC_API_URL + "/auth/refresh", {
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Authorization": `Bearer ${get(authStore)?.accessToken}`,
+            },
+            body: JSON.stringify({ refreshToken: get(authStore)?.refreshToken }),
+            method: "POST",
+        });
+        if (!res.ok) {
+            authStore.set(null);
+            goto("/");
+        }
+    }
+    catch (e) {
         authStore.set(null);
         goto("/");
     }
