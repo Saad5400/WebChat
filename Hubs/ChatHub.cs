@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using WebChat.Data;
 using WebChat.Models;
 
@@ -15,14 +16,17 @@ public class ChatHub(AppDbContext db, ILogger<ChatHub> logger) : Hub
     public override Task OnConnectedAsync()
     {
         _logger.LogInformation("User {UserId} connected", Context.UserIdentifier);
-        _connectedUsers.Add(Context.UserIdentifier!, Context.ConnectionId);
+        _connectedUsers.TryAdd(Context.UserIdentifier!, Context.ConnectionId);
         return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         _logger.LogInformation("User {UserId} disconnected", Context.UserIdentifier);
-        _connectedUsers.Remove(Context.UserIdentifier!);
+        if (_connectedUsers.ContainsKey(Context.UserIdentifier!))
+        {
+            _connectedUsers.Remove(Context.UserIdentifier!);
+        }
         return base.OnDisconnectedAsync(exception);
     }
 
@@ -36,8 +40,13 @@ public class ChatHub(AppDbContext db, ILogger<ChatHub> logger) : Hub
 
         if (_connectedUsers.ContainsKey(message.ReceiverId))
         {
+            message.Sender = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == message.SenderId) ?? throw new InvalidOperationException("Sender not found");
+            message.Receiver = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == message.ReceiverId) ?? throw new InvalidOperationException("Receiver not found");
             await Clients.Client(_connectedUsers[message.ReceiverId]).SendAsync("ReceiveMessage", message);
         }
+
+        message.Sender = null!;
+        message.Receiver = null!;
 
         await _db.Messages.AddAsync(message);
         await _db.SaveChangesAsync();

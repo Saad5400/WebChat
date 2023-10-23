@@ -6,19 +6,29 @@
 	import { ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
 	import authStore from "$lib/stores/authStore.store.";
 	import { get } from "svelte/store";
+	import type { PageData } from "./$types";
+	import { page } from "$app/stores";
+	import { onDestroy } from "svelte";
 
 	// Navigation List
 	let currentChat: Chat;
 
-	$: {
-		if (currentChat) {
-			goto(`/chats/${currentChat.user.email}`);
+	$: if (currentChat) {
+		goto(`/chats/${currentChat.user.email}`);
+	} else if ($page.params.email) {
+		const chat = searchChats.find(
+			(chat) => chat.user.email === $page.params.email
+		);
+		if (chat) {
+			currentChat = chat;
+		} else {
+			goto("/chats");
 		}
 	}
 
 	let searchString = "";
 	let chats: Chat[] = [];
-	$: searchChats = chats;
+	let searchChats: Chat[] = [];
 
 	async function populateChats() {
 		const data: Chat[] = await fetchChats();
@@ -28,6 +38,7 @@
 				new Date(a.lastMessage.createdAt!).getTime()
 			);
 		});
+		searchChats = chats;
 	}
 
 	populateChats();
@@ -55,6 +66,43 @@
 					},
 				},
 			];
+		}
+	});
+
+	export let data: PageData;
+
+	function reciveMessageLayout(message: Message) {
+		console.log("LAYOUT");
+
+		const lastChat = currentChat;
+
+		chats = [
+			{
+				user: message.sender!,
+				lastMessage: message,
+			},
+			...chats.filter((chat) => chat.user.id !== message.senderId),
+		];
+
+		if (lastChat.user.id === message.senderId) {
+			currentChat = chats[0];
+		}
+
+		searchChats = chats;
+	}
+
+	$: connection = data.connection;
+	$: if (connection) {
+		// clear any previous event handlers
+		connection.off("ReceiveMessage", reciveMessageLayout);
+
+		// on receive message
+		connection.on("ReceiveMessage", reciveMessageLayout);
+	}
+
+	onDestroy(() => {
+		if (connection) {
+			connection.off("ReceiveMessage", reciveMessageLayout);
 		}
 	});
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import { page } from "$app/stores";
 	import getUsers from "$lib/api/users/get";
 	import { goto } from "$app/navigation";
@@ -120,18 +120,29 @@
 	}
 
 	export let data: PageData;
+
+	function reciveMessagePage(message: Message) {
+		if (message.senderId !== currentUser.id) return;
+		console.log("PAGE");
+		message.createdAt = getTimestamp();
+		addMessage(message);
+	}
+
 	$: ({ connection } = data);
 
 	$: if (connection) {
 		// clear any previous event handlers
-		connection.off("ReceiveMessage");
+		connection.off("ReceiveMessage", reciveMessagePage);
 
 		// on receive message
-		connection.on("ReceiveMessage", (message: Message) => {
-			message.createdAt = getTimestamp();
-			addMessage(message);
-		});
+		connection.on("ReceiveMessage", reciveMessagePage);
 	}
+
+	onDestroy(() => {
+		if (connection) {
+			connection.off("ReceiveMessage", reciveMessagePage);
+		}
+	});
 </script>
 
 <svelte:window on:resize={setMaxChatHeight} />

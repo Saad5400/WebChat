@@ -20,6 +20,8 @@ interface Message {
 	isRead?: boolean;
 	receiverId?: string;
 	senderId?: string;
+	sender?: User;
+	receiver?: User;
 }
 interface Chat {
 	user: User;
