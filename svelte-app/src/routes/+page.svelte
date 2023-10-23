@@ -45,8 +45,8 @@
 
             if (dy < -minDelta)
                 scrollTo(0, registerElement.getBoundingClientRect().top + y);
-            if (dy > minDelta)
-                scrollTo(0, landingElement.getBoundingClientRect().top + y);
+            // if (dy > minDelta)
+            //     scrollTo(0, landingElement.getBoundingClientRect().top + y);
         }
     };
 

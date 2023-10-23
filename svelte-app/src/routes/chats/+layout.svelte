@@ -107,7 +107,7 @@
 </script>
 
 <div
-	class="fixed flex flex-row justify-between left-0 right-0 top-0 md:hidden bg-surface-900/100 p-2 z-10"
+	class="fixed flex flex-row justify-between left-0 right-0 top-0 md:hidden bg-surface-900/100 ring-2 p-2 px-4 z-10"
 >
 	<button on:click={() => (toggleSideBar = !toggleSideBar)}>
 		<svg
@@ -125,9 +125,9 @@
 			/>
 		</svg>
 	</button>
-	<h3>
+	<p class="flex-1 text-center">
 		{currentChat?.user?.email ?? "Select a chat"}
-	</h3>
+	</p>
 </div>
 
 <div class="chat w-full min-h-screen flex flex-row">
@@ -138,7 +138,18 @@
 		class:opacity-0={toggleSideBar}
 	>
 		<!-- Header -->
-		<header class="border-b border-surface-500/30 p-4">
+		<header class="border-b border-surface-500/30 p-4 flex flex-col gap-2">
+			<div class="flex flex-row items-center justify-between">
+				<span class="flex-1 text-secondary-100/50" >
+					{ $authStore?.email }
+				</span>
+				<button class="btn variant-soft-error" on:click={() => {
+					authStore.set(null);
+					goto("/");
+				}}>
+					Logout
+				</button>
+			</div>
 			<input
 				class="input"
 				type="search"

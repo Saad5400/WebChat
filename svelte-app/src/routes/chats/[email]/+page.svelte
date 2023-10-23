@@ -148,7 +148,7 @@
 <svelte:window on:resize={setMaxChatHeight} />
 
 <!-- Chat -->
-<div class="flex flex-col flex-1">
+<div class="flex flex-col flex-1 mt-10 md:mt-0">
 	<!-- Conversation -->
 	<section bind:this={elemChat} class="flex-initial h-full overflow-y-scroll">
 		<div class="p-4 space-y-4" bind:this={elemChatContent}>
@@ -176,7 +176,7 @@
 								{bubble.createdAt}
 							</small>
 						</header>
-						<p class="whitespace-pre">
+						<p class="break-all whitespace-pre-wrap">
 							{bubble.text}
 						</p>
 					</div>
@@ -187,12 +187,11 @@
 	<!-- Prompt -->
 	<section class="border-t border-surface-500/30 p-4 h-fit bottom-0">
 		<div
-			class="input-group input-group-divider grid-cols-[auto_1fr_auto] rounded-container-token"
+			class="input-group input-group-divider flex flex-row w-full rounded-container-token"
 		>
-			<button class="input-group-shim">+</button>
 			<textarea
 				bind:value={currentMessage}
-				class="bg-transparent border-0 ring-0"
+				class="bg-transparent border-0 ring-0 flex-1"
 				name="prompt"
 				id="prompt"
 				placeholder="Write a message..."
