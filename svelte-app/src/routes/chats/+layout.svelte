@@ -4,8 +4,10 @@
 	import searchUsers from "$lib/api/users/search";
 	import useDebounce from "$lib/hooks/useDebounce";
 	import { ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
-    import authStore from "$lib/stores/authStore.store.";
-    import { get } from "svelte/store";
+	import authStore from "$lib/stores/authStore.store.";
+	import { get } from "svelte/store";
+	import * as signalR from "@microsoft/signalr";
+	import { PUBLIC_API_URL } from "$env/static/public";
 
 	// Navigation List
 	let currentChat: Chat;
@@ -42,7 +44,8 @@
 
 		const users: User[] = await searchUsers(searchString);
 		for (const user of users) {
-			if (searchChats.find((chat) => chat.user.email === user.email)) continue;
+			if (searchChats.find((chat) => chat.user.email === user.email))
+				continue;
 			if (user.id == get(authStore)!.id) continue;
 
 			searchChats = [
@@ -56,6 +59,24 @@
 			];
 		}
 	});
+
+	const connection = new signalR.HubConnectionBuilder()
+		.withUrl(PUBLIC_API_URL + "/hubs/chat", {
+			accessTokenFactory: () => get(authStore)!.accessToken!,
+			headers: {
+				"Access-Control-Allow-Origin": "*",
+				"Authorization": `Bearer ${get(authStore)!.accessToken}`,
+			},
+			withCredentials: false,
+		})
+		.withAutomaticReconnect()
+		.build();
+
+	connection.on("ReceiveMessage", (message: Message) => {
+		console.log("ReceiveMessage", message);
+	});
+
+	connection.start();
 </script>
 
 <div class="chat w-full min-h-screen grid grid-cols-1 lg:grid-cols-[30%_1fr]">
@@ -78,7 +99,11 @@
 			<small class="opacity-50"> Contacts </small>
 			<ListBox active="variant-filled-primary">
 				{#each searchChats as chat}
-					<ListBoxItem bind:group={currentChat} name="people" value={chat}>
+					<ListBoxItem
+						bind:group={currentChat}
+						name="people"
+						value={chat}
+					>
 						<!-- <svelte:fragment slot="lead">
 							<Avatar
 								src="https://i.pravatar.cc/?img={person.avatar}"
@@ -88,7 +113,9 @@
 						{chat.user.email}
 						<small class="opacity-50 text-xs m-0 ms-2 p-0">
 							{chat.lastMessage.text.slice(0, 20) +
-								(chat.lastMessage.text.length > 20 ? " .." : "")}
+								(chat.lastMessage.text.length > 20
+									? " .."
+									: "")}
 						</small>
 					</ListBoxItem>
 				{/each}

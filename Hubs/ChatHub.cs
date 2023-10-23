@@ -4,25 +4,29 @@ using WebChat.Models;
 
 namespace WebChat;
 
-public class ChatHub(AppDbContext db) : Hub
+public class ChatHub(AppDbContext db, ILogger<ChatHub> logger): Hub
 {
     private static readonly Dictionary<string, string> _connectedUsers = [];
     private readonly AppDbContext _db = db;
+    private readonly ILogger<ChatHub> _logger = logger;
 
     public override Task OnConnectedAsync()
     {
-        _connectedUsers.Add(Context.UserIdentifier!, Context.ConnectionId);
+        _logger.LogInformation("User {UserId} connected", Context.UserIdentifier);
+        // _connectedUsers.Add(Context.UserIdentifier!, Context.ConnectionId);
         return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        _connectedUsers.Remove(Context.UserIdentifier!);
+        _logger.LogInformation("User {UserId} disconnected", Context.UserIdentifier);
+        // _connectedUsers.Remove(Context.UserIdentifier!);
         return base.OnDisconnectedAsync(exception);
     }
 
     public async Task SendMessage(string receiverId, string messageText)
     {
+        _logger.LogInformation("User {UserId} sent message to {ReceiverId}", Context.UserIdentifier, receiverId);
         if (_connectedUsers.ContainsKey(receiverId))
         {
             await Clients.Client(_connectedUsers[receiverId]).SendAsync("ReceiveMessage", messageText);

@@ -1,6 +1,8 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebChat;
 using WebChat.Data;
@@ -19,6 +21,19 @@ builder.Services.AddAuthentication()
     {
         // options.BearerTokenExpiration = TimeSpan.FromSeconds(10);
         // options.RefreshTokenExpiration = TimeSpan.FromSeconds(60);
+        options.Events = new BearerTokenEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Headers.Authorization.ToString().Split(" ").Last();
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/api/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            },
+        };
     });
 builder.Services.AddAuthorization();
 
@@ -52,12 +67,14 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-app.UseCors();
 app.UseStaticFiles();
+app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 
 var api = app.MapGroup("/api");
 var auth = api.MapGroup("/auth");
-var hubs = api.MapGroup("/hubs").RequireAuthorization();
+var hubs = api.MapGroup("/hubs");
 var users = api.MapGroup("/users").RequireAuthorization();
 var messages = api.MapGroup("/messages").RequireAuthorization();
 var chats = api.MapGroup("/chats").RequireAuthorization();
