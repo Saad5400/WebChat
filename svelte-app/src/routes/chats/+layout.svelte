@@ -74,8 +74,6 @@
 	function reciveMessageLayout(message: Message) {
 		console.log("LAYOUT");
 
-		const lastChat = currentChat;
-
 		chats = [
 			{
 				user: message.sender!,
@@ -83,12 +81,13 @@
 			},
 			...chats.filter((chat) => chat.user.id !== message.senderId),
 		];
+		searchChats = chats;
+
+		const lastChat = currentChat;
 
 		if (lastChat.user.id === message.senderId) {
 			currentChat = chats[0];
 		}
-
-		searchChats = chats;
 	}
 
 	$: connection = data.connection;
@@ -105,12 +104,40 @@
 			connection.off("ReceiveMessage", reciveMessageLayout);
 		}
 	});
+
+	let toggleSideBar = true;
 </script>
 
-<div class="chat w-full min-h-screen grid grid-cols-1 md:grid-cols-[30%_1fr]">
+<div
+	class="fixed flex flex-row justify-between left-0 right-0 top-0 md:hidden bg-surface-900/100 p-2 z-10"
+>
+	<button on:click={() => (toggleSideBar = !toggleSideBar)}>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke-width="1.5"
+			stroke="currentColor"
+			class="w-6 h-6"
+		>
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+			/>
+		</svg>
+	</button>
+	<h3>
+		{currentChat?.user?.email ?? "Select a chat"}
+	</h3>
+</div>
+
+<div class="chat w-full min-h-screen flex flex-row">
 	<!-- Navigation -->
 	<div
-		class="hidden md:grid grid-rows-[auto_1fr_auto] border-r border-surface-500/30"
+		class="max-w-xs border-r border-surface-500/30 bg-surface-900 fixed h-full z-10 transition-all md:visible md:opacity-100"
+		class:invisible={toggleSideBar}
+		class:opacity-0={toggleSideBar}
 	>
 		<!-- Header -->
 		<header class="border-b border-surface-500/30 p-4">
@@ -152,5 +179,9 @@
 		<!-- Footer -->
 		<!-- <footer class="border-t border-surface-500/30 p-4">(footer)</footer> -->
 	</div>
-	<slot />
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<div class="contents" on:click={() => (toggleSideBar = true)}>
+		<slot />
+	</div>
 </div>

@@ -148,7 +148,7 @@
 <svelte:window on:resize={setMaxChatHeight} />
 
 <!-- Chat -->
-<div class="flex flex-col justify-between">
+<div class="flex flex-col flex-1">
 	<!-- Conversation -->
 	<section bind:this={elemChat} class="flex-initial h-full overflow-y-scroll">
 		<div class="p-4 space-y-4" bind:this={elemChatContent}>
