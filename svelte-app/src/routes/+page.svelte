@@ -57,7 +57,7 @@
         e.preventDefault();
         if (validEmail && validPassword) {
             const authRes = await register(email, password);
-            
+
             if (authRes.ok === false) {
                 errorMessage = "Invalid credentials";
                 return;
@@ -111,13 +111,13 @@
     class="flex items-center w-full min-h-[100dvh] max-w-xs sm:max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto"
     bind:this={landingElement}
 >
-    <h2 class="text-center h2 gradient-text gradient-heading1">
-        Welcome to the
+    <div class="flex flex-col items-center gradient-text gradient-heading1">
+        <h2 class="text-center h2">Welcome to the</h2>
         <h1 class="h1 gradient-text gradient-heading2">New WhatsApp</h1>
-        <h3 class="h3">
+        <h3 class="h3 text-center">
             We provide complete privacy with a seamless experience
         </h3>
-    </h2>
+    </div>
 </div>
 <div class="min-h-screen flex flex-row w-full items-center">
     <div

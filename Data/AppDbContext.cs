@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WebChat.Models;
 
-namespace WebCha.Data;
+namespace WebChat.Data;
 
 public class AppDbContext : IdentityDbContext<User>
 {

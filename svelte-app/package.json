@@ -29,6 +29,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@microsoft/signalr": "^7.0.12",
     "validator": "^13.11.0"
   }
 }

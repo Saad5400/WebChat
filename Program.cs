@@ -2,7 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebCha.Data;
+using WebChat;
+using WebChat.Data;
 using WebChat.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +47,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// SignalR
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 app.UseCors();
@@ -53,11 +57,14 @@ app.UseStaticFiles();
 
 var api = app.MapGroup("/api");
 var auth = api.MapGroup("/auth");
+var hubs = api.MapGroup("/hubs").RequireAuthorization();
 var users = api.MapGroup("/users").RequireAuthorization();
 var messages = api.MapGroup("/messages").RequireAuthorization();
 var chats = api.MapGroup("/chats").RequireAuthorization();
 
 auth.MapIdentityApi<User>();
+
+hubs.MapHub<ChatHub>("/chat");
 
 users.MapGet("/", async (AppDbContext db, [FromQuery] string? email, [FromQuery] string? id) =>
 {
