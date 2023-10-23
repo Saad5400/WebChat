@@ -13,9 +13,7 @@
 	// Navigation List
 	let currentChat: Chat;
 
-	$: if (currentChat) {
-		goto(`/chats/${currentChat.user.email}`);
-	} else if ($page.params.email) {
+	$: if ($page.params.email) {
 		const chat = searchChats.find(
 			(chat) => chat.user.email === $page.params.email
 		);
@@ -135,7 +133,7 @@
 <div class="chat w-full min-h-screen flex flex-row">
 	<!-- Navigation -->
 	<div
-		class="max-w-xs border-r border-surface-500/30 bg-surface-900 fixed h-full z-10 transition-all md:visible md:opacity-100"
+		class="max-w-xs border-r border-surface-500/30 bg-surface-900 fixed md:relative min-h-screen z-10 transition-all md:visible md:opacity-100"
 		class:invisible={toggleSideBar}
 		class:opacity-0={toggleSideBar}
 	>
@@ -158,6 +156,10 @@
 						bind:group={currentChat}
 						name="people"
 						value={chat}
+						on:click={() => {
+							goto(`/chats/${chat.user.email}`);
+							toggleSideBar = true;
+						}}
 					>
 						<!-- <svelte:fragment slot="lead">
 							<Avatar
