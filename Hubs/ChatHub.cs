@@ -6,7 +6,7 @@ using WebChat.Models;
 namespace WebChat;
 
 [Authorize]
-public class ChatHub(AppDbContext db, ILogger<ChatHub> logger): Hub
+public class ChatHub(AppDbContext db, ILogger<ChatHub> logger) : Hub
 {
     private static readonly Dictionary<string, string> _connectedUsers = [];
     private readonly AppDbContext _db = db;
@@ -15,32 +15,30 @@ public class ChatHub(AppDbContext db, ILogger<ChatHub> logger): Hub
     public override Task OnConnectedAsync()
     {
         _logger.LogInformation("User {UserId} connected", Context.UserIdentifier);
-        // _connectedUsers.Add(Context.UserIdentifier!, Context.ConnectionId);
+        _connectedUsers.Add(Context.UserIdentifier!, Context.ConnectionId);
         return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         _logger.LogInformation("User {UserId} disconnected", Context.UserIdentifier);
-        // _connectedUsers.Remove(Context.UserIdentifier!);
+        _connectedUsers.Remove(Context.UserIdentifier!);
         return base.OnDisconnectedAsync(exception);
     }
 
-    public async Task SendMessage(string receiverId, string messageText)
+    public async Task SendMessage(Message message)
     {
-        _logger.LogInformation("User {UserId} sent message to {ReceiverId}", Context.UserIdentifier, receiverId);
-        if (_connectedUsers.ContainsKey(receiverId))
+        _logger.LogInformation("User {UserId} sent message to {ReceiverId} with text {MessageText}", Context.UserIdentifier, message.ReceiverId, message.Text);
+
+        message.SenderId = Context.UserIdentifier!;
+        message.CreatedAt = DateTime.UtcNow;
+        message.IsRead = false;
+
+        if (_connectedUsers.ContainsKey(message.ReceiverId))
         {
-            await Clients.Client(_connectedUsers[receiverId]).SendAsync("ReceiveMessage", messageText);
+            await Clients.Client(_connectedUsers[message.ReceiverId]).SendAsync("ReceiveMessage", message);
         }
 
-        var message = new Message
-        {
-            SenderId = Context.UserIdentifier!,
-            ReceiverId = receiverId,
-            Text = messageText,
-            CreatedAt = DateTime.Now,
-        };
         await _db.Messages.AddAsync(message);
         await _db.SaveChangesAsync();
     }

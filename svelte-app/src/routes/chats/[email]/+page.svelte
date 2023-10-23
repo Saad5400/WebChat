@@ -5,6 +5,9 @@
 	import { goto } from "$app/navigation";
 	import postNewMessage from "$lib/api/messages/post";
 	import getMessages from "$lib/api/messages/get";
+	import type { PageData } from "./$types";
+	import { get } from "svelte/store";
+	import authStore from "$lib/stores/authStore.store.";
 
 	let elemChat: HTMLElement;
 	let elemChatContent: HTMLElement;
@@ -52,51 +55,10 @@
 		elemChat.scrollTo({ top: elemChat.scrollHeight, behavior });
 	}
 
-	function getTimestamp(timestamp?: string): string {
-		let date;
-
-		if (timestamp) {
-			date = new Date(timestamp);
-			date = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-		} else {
-			date = new Date();
-		}
-
-		return date.toLocaleString("en-US", {
-			hour: "numeric",
-			minute: "numeric",
-			hour12: true,
-		});
-	}
-
-	function addMessage(): void {
-		const newMessage: Message = {
-			text: currentMessage,
-			receiverId: currentUser.id,
-		};
-		postNewMessage(newMessage);
-		// Update the message feed
-		messageFeed = [
-			...messageFeed,
-			{
-				...newMessage,
-				createdAt: getTimestamp(),
-			},
-		];
-
-		// Clear prompt
-		currentMessage = "";
-		// Smooth scroll to bottom
-		// Timeout prevents race condition
-		setTimeout(() => {
-			scrollChatBottom("smooth");
-		}, 0);
-	}
-
 	function onPromptKeydown(event: KeyboardEvent): void {
 		if (["Enter"].includes(event.code)) {
 			event.preventDefault();
-			addMessage();
+			sendMessage();
 		}
 	}
 
@@ -114,6 +76,63 @@
 	onMount(() => {
 		setMaxChatHeight();
 	});
+
+	function getTimestamp(timestamp?: string): string {
+		let date;
+
+		if (timestamp) {
+			date = new Date(timestamp);
+			date = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+		} else {
+			date = new Date();
+		}
+
+		return date.toLocaleString("en-US", {
+			hour: "numeric",
+			minute: "numeric",
+			hour12: true,
+		});
+	}
+
+	function addMessage(newMessage: Message): void {
+		// Update the message feed
+		messageFeed = [...messageFeed, newMessage];
+		// Smooth scroll to bottom
+		// Timeout prevents race condition
+		setTimeout(() => {
+			scrollChatBottom("smooth");
+		}, 0);
+	}
+
+	function sendMessage(): void {
+		const newMessage: Message = {
+			text: currentMessage,
+			receiverId: currentUser.id,
+			senderId: get(authStore)!.id,
+		};
+		addMessage({
+			...newMessage,
+			createdAt: getTimestamp(),
+		});
+		connection.invoke("SendMessage", newMessage);
+		// Clear prompt
+		currentMessage = "";
+	}
+
+	export let data: PageData;
+	$: ({ connection } = data);
+
+	$: if (connection) {
+		// clear any previous event handlers
+		connection.off("ReceiveMessage");
+
+		// on receive message
+		connection.on("ReceiveMessage", (message: Message) => {
+			console.log(message.createdAt);
+			message.createdAt = getTimestamp(message.createdAt);
+			addMessage(message);
+		});
+	}
 </script>
 
 <svelte:window on:resize={setMaxChatHeight} />
@@ -130,13 +149,18 @@
 				>
 					<div
 						class="card p-4 space-y-2 w-fit"
-						class:variant-soft-primary={bubble.senderId === currentUser.id}
-						class:rounded-tr-none={bubble.senderId === currentUser.id}
-						class:rounded-tl-none={bubble.senderId !== currentUser.id}
+						class:variant-soft-primary={bubble.senderId ===
+							currentUser.id}
+						class:rounded-tr-none={bubble.senderId ===
+							currentUser.id}
+						class:rounded-tl-none={bubble.senderId !==
+							currentUser.id}
 					>
 						<header class="flex justify-between items-center">
 							<p class="font-bold me-2">
-								{bubble.senderId === currentUser.id ? currentUser.email : "You"}
+								{bubble.senderId === currentUser.id
+									? currentUser.email
+									: "You"}
 							</p>
 							<small class="opacity-50">
 								{bubble.createdAt}
@@ -164,8 +188,10 @@
 				on:keydown={onPromptKeydown}
 			/>
 			<button
-				class={currentMessage ? "variant-filled-primary" : "input-group-shim"}
-				on:click={addMessage}
+				class={currentMessage
+					? "variant-filled-primary"
+					: "input-group-shim"}
+				on:click={sendMessage}
 			>
 				<i class="fa-solid fa-paper-plane" />
 			</button>

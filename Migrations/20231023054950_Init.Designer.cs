@@ -11,7 +11,7 @@ using WebChat.Data;
 namespace WebChat.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231022220246_Init")]
+    [Migration("20231023054950_Init")]
     partial class Init
     {
         /// <inheritdoc />

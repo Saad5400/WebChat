@@ -2,6 +2,8 @@ import getUsers from "$lib/api/users/get";
 import authStore from "$lib/stores/authStore.store.";
 import { redirect, type Load } from "@sveltejs/kit";
 import { get } from "svelte/store";
+import * as signalR from "@microsoft/signalr";
+import { PUBLIC_API_URL } from "$env/static/public";
 
 export const load: Load = async () => {
     if (!get(authStore)) {
@@ -19,4 +21,22 @@ export const load: Load = async () => {
         authStore.set(null);
         throw redirect(302, "/chats");
     }
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl(PUBLIC_API_URL + "/hubs/chat", {
+            accessTokenFactory: () => get(authStore)!.accessToken!,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Authorization": `Bearer ${get(authStore)!.accessToken}`,
+            },
+            withCredentials: false,
+        })
+        .withAutomaticReconnect()
+        .build();
+
+    await connection.start();
+
+    return {
+        connection,
+    };
 };

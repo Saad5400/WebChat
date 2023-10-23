@@ -6,8 +6,6 @@
 	import { ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
 	import authStore from "$lib/stores/authStore.store.";
 	import { get } from "svelte/store";
-	import * as signalR from "@microsoft/signalr";
-	import { PUBLIC_API_URL } from "$env/static/public";
 
 	// Navigation List
 	let currentChat: Chat;
@@ -59,24 +57,6 @@
 			];
 		}
 	});
-
-	const connection = new signalR.HubConnectionBuilder()
-		.withUrl(PUBLIC_API_URL + "/hubs/chat", {
-			accessTokenFactory: () => get(authStore)!.accessToken!,
-			headers: {
-				"Access-Control-Allow-Origin": "*",
-				"Authorization": `Bearer ${get(authStore)!.accessToken}`,
-			},
-			withCredentials: false,
-		})
-		.withAutomaticReconnect()
-		.build();
-
-	connection.on("ReceiveMessage", (message: Message) => {
-		console.log("ReceiveMessage", message);
-	});
-
-	connection.start();
 </script>
 
 <div class="chat w-full min-h-screen grid grid-cols-1 md:grid-cols-[30%_1fr]">
