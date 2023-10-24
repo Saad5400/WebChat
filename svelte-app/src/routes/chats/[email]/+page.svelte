@@ -67,21 +67,6 @@
 		}
 	}
 
-	function setMaxChatHeight() {
-		elemChat.style.maxHeight = "none";
-		// get all the children of elmChat
-		// @ts-ignore
-		const display = elemChatContent.style.display;
-		elemChatContent.style.display = "none";
-		elemChat.style.maxHeight = `${elemChat.offsetHeight}px`;
-		elemChatContent.style.display = display;
-		scrollChatBottom();
-	}
-
-	onMount(() => {
-		setMaxChatHeight();
-	});
-
 	function getTimestamp(timestamp?: string): string {
 		let date;
 
@@ -150,12 +135,13 @@
 	});
 </script>
 
-<svelte:window on:resize={setMaxChatHeight} />
-
 <!-- Chat -->
 <div class="flex flex-col flex-1 mt-10 md:mt-0">
 	<!-- Conversation -->
-	<section bind:this={elemChat} class="flex-initial h-full overflow-y-scroll">
+	<section
+		bind:this={elemChat}
+		class="flex-initial h-full overflow-y-scroll max-h-[calc(100dvh-7.5rem)] sm:max-h-[calc(100dvh-7rem)] md:max-h-[calc(100dvh-6.5rem)] lg:max-h-[calc(100dvh-6rem)] xl:max-h-[calc(100dvh-5.5rem)] 2xl:max-h-[calc(100dvh-5rem)]"
+	>
 		<div class="p-4 space-y-4" bind:this={elemChatContent}>
 			{#each messageFeed as bubble}
 				<div
@@ -197,6 +183,7 @@
 			<textarea
 				bind:value={currentMessage}
 				class="bg-transparent border-0 ring-0 flex-1"
+				rows="1"
 				name="prompt"
 				id="prompt"
 				placeholder="Write a message..."
