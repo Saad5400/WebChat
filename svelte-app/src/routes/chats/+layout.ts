@@ -10,16 +10,21 @@ export const load: Load = async () => {
         throw redirect(302, "/");
     }
 
-    const userRes = await getUsers(get(authStore)?.email);
-    if (userRes.ok === false) {
-        authStore.set(null);
-        throw redirect(302, "/chats");
-    }
+    try {
+        const userRes = await getUsers(get(authStore)?.email);
+        if (userRes.ok === false) {
+            authStore.set(null);
+            throw redirect(302, "/");
+        }
 
-    const userData: User[] = await userRes.json();
-    if (userData.length === 0) {
+        const userData: User[] = await userRes.json();
+        if (userData.length === 0) {
+            authStore.set(null);
+            throw redirect(302, "/");
+        }
+    } catch (e) {
         authStore.set(null);
-        throw redirect(302, "/chats");
+        throw redirect(302, "/");
     }
 
     const connection = new signalR.HubConnectionBuilder()

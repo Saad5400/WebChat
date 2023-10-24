@@ -17,11 +17,16 @@
 	let messageFeed: Message[] = [];
 
 	async function populateUser(email: string) {
-		let users: User[] = await (await getUsers(email)).json();
-		if (users.length === 0) {
-			goto("/chats");
+		try {
+			let users: User[] = await (await getUsers(email)).json();
+			if (users.length === 0) {
+				goto("/chats");
+			}
+			currentUser = users[0];
+		} catch (error) {
+			authStore.set(null);
+			goto("/");
 		}
-		currentUser = users[0];
 	}
 
 	async function populateMessages() {
@@ -221,6 +226,11 @@
 		</div>
 	</section>
 </div>
+
+<!-- 
+
+
+-->
 
 <style lang="postcss">
 </style>

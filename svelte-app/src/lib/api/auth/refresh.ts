@@ -25,7 +25,7 @@ export default async function refresh() {
         authStore.set(null);
         goto("/");
     }
-    const authData = await res.json();
+    const authData = await res!.json();
     const storeData = get(authStore)!;
     authStore.set({
         accessToken: authData.accessToken,

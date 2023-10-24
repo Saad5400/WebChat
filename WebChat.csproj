@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <None Update="Data\app.db">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

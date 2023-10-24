@@ -91,7 +91,7 @@
     };
 
     const unSub = authStore.subscribe((store) => {
-        if (store?.accessToken && store?.email) {
+        if (store?.accessToken !== null && store?.email !== null) {
             goto("/chats");
         }
     });
