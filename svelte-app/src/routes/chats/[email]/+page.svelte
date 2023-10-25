@@ -3,7 +3,6 @@
 	import { page } from "$app/stores";
 	import getUsers from "$lib/api/users/get";
 	import { goto } from "$app/navigation";
-	import postNewMessage from "$lib/api/messages/post";
 	import getMessages from "$lib/api/messages/get";
 	import type { PageData } from "./$types";
 	import { get } from "svelte/store";
@@ -152,7 +151,7 @@
 				>
 					<div
 						class="card p-4 space-y-2 w-fit"
-						class:variant-soft-primary={bubble.senderId ===
+						class:variant-soft-primary={bubble.senderId !==
 							currentUser.id}
 						class:rounded-tr-none={bubble.senderId ===
 							currentUser.id}

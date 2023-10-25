@@ -47,7 +47,7 @@
 			return chat.user.email.includes(searchString);
 		});
 
-		if (searchString.length < 3) return;
+		if (searchString.length < 5) return;
 
 		const users: User[] = await searchUsers(searchString);
 		for (const user of users) {

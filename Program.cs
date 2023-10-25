@@ -107,12 +107,17 @@ users.MapGet("/", async (AppDbContext db, [FromQuery] string? email, [FromQuery]
 
 users.MapPost("/search", async (AppDbContext db, [FromBody] string q) =>
 {
-    var users = await db.Users.Where(u => u.Email!.Contains(q)).ToListAsync();
-    return users.Select(u => new
+    if (string.IsNullOrWhiteSpace(q) || q.Length < 5)
+    {
+        return Results.BadRequest("Query must be at least 5 characters long");
+    }
+    var users = await db.Users.Where(u => u.Email!.Equals(q)).ToListAsync();
+    var res = users.Select(u => new
     {
         u.Id,
         u.Email,
     });
+    return Results.Ok(res);
 });
 
 chats.MapGet("/", async (AppDbContext db, ClaimsPrincipal user) =>
