@@ -3,6 +3,7 @@
     import register from "$lib/api/auth/register";
     import getUsers from "$lib/api/users/get";
     import authStore from "$lib/stores/authStore.store.";
+    import loadingStore from "$lib/stores/loadingStore.store";
     import { onDestroy, onMount } from "svelte";
     import isEmail from "validator/es/lib/isEmail";
     import isStrongPassword from "validator/es/lib/isStrongPassword";
@@ -58,6 +59,7 @@
     // register
     const registerSubmit = async (e: Event) => {
         e.preventDefault();
+        loadingStore.set(true);
         if (validEmail && validPassword) {
             const authRes = await register(email, password);
 
@@ -91,6 +93,7 @@
                 email: user.email,
             });
         }
+        loadingStore.set(false);
     };
 
     const unSub = authStore.subscribe((store) => {
