@@ -130,7 +130,7 @@
 	</p>
 </div>
 
-<div class="chat w-full min-h-screen flex flex-row">
+<div class="chat w-full flex flex-row">
 	<!-- Navigation -->
 	<div
 		class="max-w-xs border-r border-surface-500/30 bg-surface-900 fixed md:relative min-h-screen z-10 transition-all md:visible md:opacity-100"
@@ -139,7 +139,7 @@
 	>
 		<!-- Header -->
 		<header class="border-b border-surface-500/30 p-4 flex flex-col gap-2">
-			<div class="flex flex-row items-center justify-between">
+			<div class="flex flex-row items-center justify-between gap-2">
 				<span class="flex-1 text-secondary-100/50" >
 					{ $authStore?.email }
 				</span>

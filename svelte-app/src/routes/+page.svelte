@@ -36,7 +36,7 @@
         let dy = lastY - y;
         lastY = y;
 
-        if (!scrolling && (dy < -minDelta || dy > minDelta)) {
+        if (!scrolling && dy < -minDelta) {
             scrolling = true;
 
             setTimeout(() => {
@@ -44,9 +44,7 @@
             }, 400);
 
             if (dy < -minDelta)
-                scrollTo(0, registerElement.getBoundingClientRect().top + y);
-            // if (dy > minDelta)
-            //     scrollTo(0, landingElement.getBoundingClientRect().top + y);
+                document.body.scrollTo(0, registerElement.getBoundingClientRect().top + y);
         }
     };
 
@@ -100,9 +98,10 @@
     });
 </script>
 
-<svelte:window bind:scrollY={y} />
-<svelte:document
+<svelte:body
     on:scroll={(e) => {
+        // @ts-ignore
+        y = e.target.scrollTop;
         if (scrolling) e.preventDefault();
     }}
 />

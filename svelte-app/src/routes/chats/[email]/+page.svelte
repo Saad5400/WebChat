@@ -11,6 +11,7 @@
 
 	let elemChat: HTMLElement;
 	let elemChatContent: HTMLElement;
+	let elmInput: HTMLTextAreaElement;
 
 	let currentMessage = "";
 	let currentUser: User;
@@ -91,10 +92,11 @@
 		// Timeout prevents race condition
 		setTimeout(() => {
 			scrollChatBottom("smooth");
-		}, 0);
+		}, 10);
 	}
 
 	function sendMessage(): void {
+		elmInput.focus();
 		const newMessage: Message = {
 			text: currentMessage,
 			receiverId: currentUser.id,
@@ -181,6 +183,7 @@
 			class="input-group input-group-divider flex flex-row w-full rounded-container-token"
 		>
 			<textarea
+				bind:this={elmInput}
 				bind:value={currentMessage}
 				class="bg-transparent border-0 ring-0 flex-1"
 				rows="1"
