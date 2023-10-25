@@ -43,8 +43,13 @@
                 scrolling = false;
             }, 400);
 
-            if (dy < -minDelta)
-                document.body.scrollTo(0, registerElement.getBoundingClientRect().top + y);
+            if (dy < -minDelta) {
+                registerElement.focus();
+                document.body.scrollTo(
+                    0,
+                    registerElement.getBoundingClientRect().top + y
+                );
+            }
         }
     };
 
@@ -120,7 +125,7 @@
 </div>
 <div class="min-h-screen flex flex-row w-full items-center">
     <div
-        class="w-full bg-surface-900 shadow-2xl p-6 mx-auto max-w-md sm:max-w-lg rounded-lg"
+        class="w-full bg-surface-50-900-token shadow-2xl p-6 mx-auto max-w-md sm:max-w-lg rounded-lg"
     >
         <h4 class="h4 mb-4 !font-normal gradient-text gradient-heading2">
             So, what are you waiting for? <h2
@@ -185,13 +190,15 @@
         /* Direction */
         @apply bg-gradient-to-br;
         /* Color Stops */
-        @apply from-secondary-100 via-tertiary-500 to-secondary-100;
+        @apply from-secondary-500 via-tertiary-500 to-secondary-900;
+        @apply dark:from-secondary-100 dark:via-tertiary-500 dark:to-secondary-100;
     }
 
     .gradient-heading2 {
         /* Direction */
         @apply bg-gradient-to-tl;
         /* Color Stops */
-        @apply from-primary-100 to-secondary-900;
+        @apply from-tertiary-500 to-secondary-700;
+        @apply dark:from-primary-100 dark:to-secondary-900;
     }
 </style>

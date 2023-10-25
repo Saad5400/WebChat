@@ -107,7 +107,7 @@
 </script>
 
 <div
-	class="fixed flex flex-row justify-between left-0 right-0 top-0 md:hidden bg-surface-900/100 ring-2 p-2 px-4 z-10"
+	class="fixed flex flex-row justify-between left-0 right-0 top-0 md:hidden bg-surface-50-900-token ring-2 p-2 px-4 z-10"
 >
 	<button on:click={() => (toggleSideBar = !toggleSideBar)}>
 		<svg
@@ -133,14 +133,14 @@
 <div class="chat w-full flex flex-row">
 	<!-- Navigation -->
 	<div
-		class="max-w-xs border-r border-surface-500/30 bg-surface-900 fixed md:relative min-h-screen z-10 transition-all md:visible md:opacity-100"
+		class="max-w-xs border-r border-surface-500/30 bg-surface-50-900-token fixed md:relative min-h-screen z-10 transition-all md:visible md:opacity-100"
 		class:invisible={toggleSideBar}
 		class:opacity-0={toggleSideBar}
 	>
 		<!-- Header -->
 		<header class="border-b border-surface-500/30 p-4 flex flex-col gap-2">
 			<div class="flex flex-row items-center justify-between gap-2">
-				<span class="flex-1 text-secondary-100/50" >
+				<span class="flex-1 text-secondary-800-100-token" >
 					{ $authStore?.email }
 				</span>
 				<button class="btn variant-soft-error" on:click={() => {
