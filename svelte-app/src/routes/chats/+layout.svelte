@@ -9,9 +9,11 @@
 	import type { PageData } from "./$types";
 	import { page } from "$app/stores";
 	import { onDestroy } from "svelte";
+    import loadingStore from "$lib/stores/loadingStore.store";
 
 	// Navigation List
 	let currentChat: Chat;
+	let elmSlot: HTMLDivElement;
 
 	$: if ($page.params.email) {
 		const chat = searchChats.find(
@@ -29,6 +31,7 @@
 	let searchChats: Chat[] = [];
 
 	async function populateChats() {
+		loadingStore.set(true);
 		const data: Chat[] = await fetchChats();
 		chats = data.sort((a, b) => {
 			return (
@@ -37,6 +40,7 @@
 			);
 		});
 		searchChats = chats;
+		loadingStore.set(false);
 	}
 
 	populateChats();
@@ -194,7 +198,7 @@
 	</div>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div class="contents" on:click={() => (toggleSideBar = true)}>
+	<div class="contents" on:click={() => (toggleSideBar = true)} bind:this={elmSlot}>
 		<slot />
 	</div>
 </div>
