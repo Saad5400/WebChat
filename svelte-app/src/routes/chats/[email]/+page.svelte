@@ -7,6 +7,7 @@
 	import type { PageData } from "./$types";
 	import { get } from "svelte/store";
 	import authStore from "$lib/stores/authStore.store.";
+    import loadingStore from "$lib/stores/loadingStore.store";
 
 	let elemChat: HTMLElement;
 	let elemChatContent: HTMLElement;
@@ -18,9 +19,10 @@
 
 	async function populateUser(email: string) {
 		try {
-			let users: User[] = await (await getUsers(email)).json();
+			let users: User[] = await (await getUsers("", email)).json();
 			if (users.length === 0) {
 				goto("/chats");
+				return;
 			}
 			currentUser = users[0];
 		} catch (error) {
@@ -30,6 +32,11 @@
 	}
 
 	async function populateMessages() {
+		loadingStore.set(true);
+		if (!currentUser?.id) {
+			goto("/chats");
+			return;
+		}
 		const messages = await getMessages(currentUser.id);
 		// convert created at to timestamp
 		messageFeed = messages.map((message: Message) => {
@@ -38,9 +45,10 @@
 				createdAt: getTimestamp(message.createdAt),
 			};
 		});
+		loadingStore.set(false);
 	}
 
-	page.subscribe(async (value) => {
+	const unsubPage = page.subscribe(async (value) => {
 		currentMessage = "";
 		currentUser = {} as User;
 		messageFeed = [];
@@ -130,9 +138,11 @@
 	}
 
 	onDestroy(() => {
+		unsubPage();
 		if (connection) {
 			connection.off("ReceiveMessage", reciveMessagePage);
 		}
+		loadingStore.set(false);
 	});
 </script>
 
@@ -141,7 +151,9 @@
 	<!-- Conversation -->
 	<section
 		bind:this={elemChat}
-		class="flex-initial h-full overflow-y-scroll max-h-[calc(100dvh-7.5rem)] sm:max-h-[calc(100dvh-7rem)] md:max-h-[calc(100dvh-6.5rem)] lg:max-h-[calc(100dvh-6rem)] xl:max-h-[calc(100dvh-5.5rem)] 2xl:max-h-[calc(100dvh-5rem)]"
+		class="flex-initial h-full overflow-y-scroll 
+		min-h-[calc(100dvh-7.5rem)] sm:min-h-[calc(100dvh-7rem)]
+		max-h-[calc(100dvh-7.5rem)] sm:max-h-[calc(100dvh-7rem)] md:max-h-[calc(100dvh-6.5rem)] lg:max-h-[calc(100dvh-6rem)] xl:max-h-[calc(100dvh-5.5rem)] 2xl:max-h-[calc(100dvh-5rem)]"
 	>
 		<div class="p-4 space-y-4" bind:this={elemChatContent}>
 			{#each messageFeed as bubble}

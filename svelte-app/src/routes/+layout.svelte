@@ -10,9 +10,10 @@
 	});
 </script>
 
-<svelte:head
-	>{@html `<script>${autoModeWatcher.toString()} autoModeWatcher();</script>`}</svelte:head
->
+<svelte:head>
+	<title>Web Chat</title>
+	{@html `<script>${autoModeWatcher.toString()} autoModeWatcher();</script>`}
+</svelte:head>
 
 {#if $navigating || $loadingStore}
 	<ProgressBar class="fixed top-0 w-full" meter="bg-surface-900/50" />

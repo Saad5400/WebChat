@@ -17,12 +17,10 @@
 
 	$: if ($page.params.email) {
 		const chat = searchChats.find(
-			(chat) => chat.user.email === $page.params.email
+			(chat) => chat.user.id === $page.params.email
 		);
 		if (chat) {
 			currentChat = chat;
-		} else {
-			goto("/chats");
 		}
 	}
 
@@ -172,7 +170,8 @@
 						name="people"
 						value={chat}
 						on:click={() => {
-							goto(`/chats/${chat.user.email}`);
+							// 64 encode email
+							goto(`/chats/${chat.user.id}`);
 							toggleSideBar = true;
 						}}
 					>
