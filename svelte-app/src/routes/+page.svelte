@@ -4,7 +4,9 @@
     import getUsers from "$lib/api/users/get";
     import authStore from "$lib/stores/authStore.store.";
     import loadingStore from "$lib/stores/loadingStore.store";
+    import redirectStore from "$lib/stores/redirectStore.store";
     import { onDestroy, onMount } from "svelte";
+    import { get } from "svelte/store";
     import isEmail from "validator/es/lib/isEmail";
     import isStrongPassword from "validator/es/lib/isStrongPassword";
     // import authStore from "$lib/stores/auth.store.";
@@ -95,15 +97,6 @@
         }
         loadingStore.set(false);
     };
-
-    const unSub = authStore.subscribe((store) => {
-        if (store?.accessToken !== null && store?.email !== null) {
-            goto("/chats");
-        }
-    });
-    onDestroy(() => {
-        unSub();
-    });
 </script>
 
 <svelte:body

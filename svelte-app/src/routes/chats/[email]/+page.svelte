@@ -7,7 +7,7 @@
 	import type { PageData } from "./$types";
 	import { get } from "svelte/store";
 	import authStore from "$lib/stores/authStore.store.";
-    import loadingStore from "$lib/stores/loadingStore.store";
+	import loadingStore from "$lib/stores/loadingStore.store";
 
 	let elemChat: HTMLElement;
 	let elemChatContent: HTMLElement;
@@ -18,25 +18,12 @@
 	let messageFeed: Message[] = [];
 
 	async function populateUser(email: string) {
-		try {
-			let users: User[] = await (await getUsers("", email)).json();
-			if (users.length === 0) {
-				goto("/chats");
-				return;
-			}
-			currentUser = users[0];
-		} catch (error) {
-			authStore.set(null);
-			goto("/");
-		}
+		let users: User[] = await (await getUsers("", email)).json();
+		currentUser = users[0];
 	}
 
 	async function populateMessages() {
 		loadingStore.set(true);
-		if (!currentUser?.id) {
-			goto("/chats");
-			return;
-		}
 		const messages = await getMessages(currentUser.id);
 		// convert created at to timestamp
 		messageFeed = messages.map((message: Message) => {
@@ -57,8 +44,6 @@
 			await populateUser(value.params.email);
 			await populateMessages();
 			scrollChatBottom();
-		} else {
-			goto("/chats");
 		}
 	});
 
@@ -109,10 +94,10 @@
 			receiverId: currentUser.id,
 			senderId: get(authStore)!.id,
 		};
-		addMessage({
-			...newMessage,
-			createdAt: getTimestamp(),
-		});
+		// addMessage({
+		// 	...newMessage,
+		// 	createdAt: getTimestamp(),
+		// });
 		connection.invoke("SendMessage", newMessage);
 		// Clear prompt
 		currentMessage = "";
@@ -121,7 +106,7 @@
 	export let data: PageData;
 
 	function reciveMessagePage(message: Message) {
-		if (message.senderId !== currentUser.id) return;
+		// if (message.senderId !== currentUser.id) return;
 		console.log("PAGE");
 		message.createdAt = getTimestamp();
 		addMessage(message);
@@ -151,7 +136,7 @@
 	<!-- Conversation -->
 	<section
 		bind:this={elemChat}
-		class="flex-initial h-full overflow-y-scroll 
+		class="flex-initial h-full overflow-y-scroll
 		min-h-[calc(100dvh-7.5rem)] sm:min-h-[calc(100dvh-7rem)]
 		max-h-[calc(100dvh-7.5rem)] sm:max-h-[calc(100dvh-7rem)] md:max-h-[calc(100dvh-6.5rem)] lg:max-h-[calc(100dvh-6rem)] xl:max-h-[calc(100dvh-5.5rem)] 2xl:max-h-[calc(100dvh-5rem)]"
 	>

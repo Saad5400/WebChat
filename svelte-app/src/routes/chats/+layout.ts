@@ -4,9 +4,11 @@ import { redirect, type Load } from "@sveltejs/kit";
 import { get } from "svelte/store";
 import * as signalR from "@microsoft/signalr";
 import { PUBLIC_API_URL } from "$env/static/public";
+import redirectStore from "$lib/stores/redirectStore.store";
 
-export const load: Load = async () => {
+export const load: Load = async ({ url }) => {
     if (!get(authStore)) {
+        redirectStore.set(url.pathname);
         throw redirect(302, "/");
     }
 
