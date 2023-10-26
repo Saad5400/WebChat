@@ -19,7 +19,7 @@ jobs:
       with:
         node-version: 18.x
     - name: Install NPM dependencies
-      run: npm install
+      run: cd svelte-app && npm install
     - name: Build SvelteKit
       run: cd svelte-app && npm run build
     - name: Setup .NET SDK
