@@ -125,3 +125,5 @@ src/.vs/config/applicationhost.config
 
 # Svelte build
 _app
+wwwroot/index.html
+wwwroot/favicon.png
