@@ -27,6 +27,8 @@ jobs:
       with:
         include-prerelease: True
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+    - name: Clean
+      run: dotnet clean "${{ env.WORKING_DIRECTORY }}"
     - name: Restore
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
     - name: Build
