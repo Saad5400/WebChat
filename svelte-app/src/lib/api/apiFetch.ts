@@ -16,10 +16,16 @@ export default async function apiFetch(path: string, options: RequestInit = {}, 
     };
     try {
         const res = await fetch(PUBLIC_API_URL + path, options);
+
+        if (res.status === 401 && tryRefresh) {
+            await refresh();
+            return apiFetch(path, options, false);
+        }
+
         return res;
     } catch (err) {
         if (!tryRefresh) throw err;
-        
+
         await refresh();
         return apiFetch(path, options, false);
     }
