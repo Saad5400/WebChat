@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<RuntimeIdentifier>win-x86</RuntimeIdentifier>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>preview</LangVersion>
