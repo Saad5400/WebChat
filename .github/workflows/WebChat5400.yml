@@ -30,7 +30,7 @@ jobs:
     - name: Clean
       run: dotnet clean "${{ env.WORKING_DIRECTORY }}"
     - name: Restore
-      run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
+      run: dotnet restore "${{ env.WORKING_DIRECTORY }}" --runtime win-x86
     - name: Build
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Test
