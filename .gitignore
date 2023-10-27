@@ -127,3 +127,4 @@ src/.vs/config/applicationhost.config
 _app
 wwwroot/index.html
 wwwroot/favicon.png
+/wwwroot/chats.html
