@@ -5,7 +5,6 @@
     import authStore from "$lib/stores/authStore.store.";
     import loadingStore from "$lib/stores/loadingStore.store";
     import redirectStore from "$lib/stores/redirectStore.store";
-    import { onDestroy, onMount } from "svelte";
     import { get } from "svelte/store";
     import isEmail from "validator/es/lib/isEmail";
     import isStrongPassword from "validator/es/lib/isStrongPassword";
@@ -115,8 +114,8 @@
     bind:this={landingElement}
 >
     <div class="flex flex-col items-center gradient-text gradient-heading1">
-        <h2 class="text-center h2">Welcome to the</h2>
-        <h1 class="h1 gradient-text gradient-heading2">New WhatsApp</h1>
+        <h1 class="text-center h2">Welcome to the</h1>
+        <h2 class="h1 gradient-text gradient-heading2">New WhatsApp</h2>
         <h3 class="h3 text-center">
             We provide complete privacy with a seamless experience
         </h3>

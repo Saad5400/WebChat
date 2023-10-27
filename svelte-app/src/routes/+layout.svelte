@@ -12,6 +12,7 @@
 
 <svelte:head>
 	<title>Web Chat</title>
+	<meta name="description" content="Chat with your friends privately, securely, and in real-time." />
 </svelte:head>
 
 {#if $navigating || $loadingStore}
