@@ -133,15 +133,15 @@
 </script>
 
 <!-- Chat -->
-<div class="flex flex-col flex-1 mt-10 md:mt-0">
+<div class="flex flex-col flex-1 md:mt-0 relative">
 	<!-- Conversation -->
 	<section
 		bind:this={elemChat}
 		class="flex-initial h-full overflow-y-scroll
-		min-h-[calc(100dvh-7.5rem)] sm:min-h-[calc(100dvh-7rem)]
-		max-h-[calc(100dvh-7.5rem)] sm:max-h-[calc(100dvh-7rem)] md:max-h-[calc(100dvh-6.5rem)] lg:max-h-[calc(100dvh-6rem)] xl:max-h-[calc(100dvh-5.5rem)] 2xl:max-h-[calc(100dvh-5rem)]"
+		min-h-[100dvh]
+		max-h-[100dvh]"
 	>
-		<div class="p-4 space-y-4" bind:this={elemChatContent}>
+		<div class="p-4 space-y-4 my-10 md:mt-0" bind:this={elemChatContent}>
 			{#each messageFeed as bubble}
 				<div
 					class="gap-2 flex flex-row"
@@ -175,9 +175,9 @@
 		</div>
 	</section>
 	<!-- Prompt -->
-	<section class="border-t border-surface-500/30 p-4 h-fit bottom-0">
+	<section class="h-fit bottom-0 left-0 right-0 absolute">
 		<div
-			class="input-group input-group-divider flex flex-row w-full rounded-container-token"
+			class="input-group input-group-divider variant-glass-primary variant-form-material flex flex-row w-full rounded-none"
 		>
 			<textarea
 				bind:this={elmInput}

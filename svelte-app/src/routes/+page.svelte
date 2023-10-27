@@ -200,4 +200,18 @@
         @apply from-tertiary-500 to-secondary-700;
         @apply dark:from-primary-100 dark:to-secondary-900;
     }
+
+    html {
+        overflow: hidden;
+        width: 100%;
+    }
+
+    body {
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
 </style>
