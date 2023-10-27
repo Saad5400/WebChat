@@ -4,6 +4,7 @@ import { redirect, type Load } from "@sveltejs/kit";
 import { get } from "svelte/store";
 
 export const ssr = false;
+export const prerender = true;
 
 export const load: Load = async ({ url }) => {
     // If the user is LOGGED IN
