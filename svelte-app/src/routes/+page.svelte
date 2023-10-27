@@ -9,7 +9,6 @@
     import { get } from "svelte/store";
     import isEmail from "validator/es/lib/isEmail";
     import isStrongPassword from "validator/es/lib/isStrongPassword";
-    // import authStore from "$lib/stores/auth.store.";
 
     const minInputLength = 1;
 
@@ -94,6 +93,10 @@
                 id: user.id,
                 email: user.email,
             });
+
+            const redirectUrl = get(redirectStore) || "/chats";
+            redirectStore.set("");
+            goto(redirectUrl);
         }
         loadingStore.set(false);
     };

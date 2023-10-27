@@ -5,23 +5,17 @@ import { get } from "svelte/store";
 
 export default async function refresh() {
     let res;
-    try {
-        res = await fetch(PUBLIC_API_URL + "/auth/refresh", {
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Authorization": `Bearer ${get(authStore)?.accessToken}`,
-            },
-            body: JSON.stringify({ refreshToken: get(authStore)?.refreshToken }),
-            method: "POST",
-        });
-        if (!res.ok) {
-            authStore.set(null);
-            goto("/");
-        }
-    }
-    catch (e) {
+    res = await fetch(PUBLIC_API_URL + "/auth/refresh", {
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Authorization": `Bearer ${get(authStore)?.accessToken}`,
+        },
+        body: JSON.stringify({ refreshToken: get(authStore)?.refreshToken }),
+        method: "POST",
+    });
+    if (!res.ok) {
         authStore.set(null);
         goto("/");
     }

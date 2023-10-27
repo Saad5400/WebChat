@@ -2,13 +2,13 @@
 	import { onDestroy, onMount } from "svelte";
 	import { page } from "$app/stores";
 	import getUsers from "$lib/api/users/get";
-	import { goto } from "$app/navigation";
 	import getMessages from "$lib/api/messages/get";
 	import type { PageData } from "./$types";
 	import { get } from "svelte/store";
 	import authStore from "$lib/stores/authStore.store.";
 	import loadingStore from "$lib/stores/loadingStore.store";
 
+	export let data: PageData;
 	let elemChat: HTMLElement;
 	let elemChatContent: HTMLElement;
 	let elmInput: HTMLTextAreaElement;
@@ -103,14 +103,23 @@
 		currentMessage = "";
 	}
 
-	export let data: PageData;
-
 	function reciveMessagePage(message: Message) {
-		// if (message.senderId !== currentUser.id) return;
-		console.log("PAGE");
+		if (
+			message.senderId !== currentUser.id &&
+			message.receiverId !== currentUser.id
+		)
+			return;
 		message.createdAt = getTimestamp();
 		addMessage(message);
 	}
+
+	onDestroy(() => {
+		unsubPage();
+		if (connection) {
+			connection.off("ReceiveMessage", reciveMessagePage);
+		}
+		loadingStore.set(false);
+	});
 
 	$: ({ connection } = data);
 
@@ -121,14 +130,6 @@
 		// on receive message
 		connection.on("ReceiveMessage", reciveMessagePage);
 	}
-
-	onDestroy(() => {
-		unsubPage();
-		if (connection) {
-			connection.off("ReceiveMessage", reciveMessagePage);
-		}
-		loadingStore.set(false);
-	});
 </script>
 
 <!-- Chat -->

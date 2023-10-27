@@ -9,39 +9,15 @@
 	import type { PageData } from "./$types";
 	import { page } from "$app/stores";
 	import { onDestroy } from "svelte";
-    import loadingStore from "$lib/stores/loadingStore.store";
+	import loadingStore from "$lib/stores/loadingStore.store";
 
-	// Navigation List
 	let currentChat: Chat;
 	let elmSlot: HTMLDivElement;
-
-	$: if ($page.params.email) {
-		const chat = searchChats.find(
-			(chat) => chat.user.id === $page.params.email
-		);
-		if (chat) {
-			currentChat = chat;
-		}
-	}
-
 	let searchString = "";
 	let chats: Chat[] = [];
 	let searchChats: Chat[] = [];
-
-	async function populateChats() {
-		loadingStore.set(true);
-		const data: Chat[] = await fetchChats();
-		chats = data.sort((a, b) => {
-			return (
-				new Date(b.lastMessage.createdAt!).getTime() -
-				new Date(a.lastMessage.createdAt!).getTime()
-			);
-		});
-		searchChats = chats;
-		loadingStore.set(false);
-	}
-
-	populateChats();
+	export let data: PageData;
+	let toggleSideBar = true;
 
 	const searchDebounce = useDebounce(500, async () => {
 		await populateChats();
@@ -69,24 +45,58 @@
 		}
 	});
 
-	export let data: PageData;
+	async function populateChats() {
+		loadingStore.set(true);
+		const data: Chat[] = await fetchChats();
+		chats = data.sort((a, b) => {
+			return (
+				new Date(b.lastMessage.createdAt!).getTime() -
+				new Date(a.lastMessage.createdAt!).getTime()
+			);
+		});
+		searchChats = chats;
+		loadingStore.set(false);
+	}
 
 	function reciveMessageLayout(message: Message) {
-		console.log("LAYOUT");
-
-		chats = [
-			{
-				user: message.sender!,
-				lastMessage: message,
-			},
-			...chats.filter((chat) => chat.user.id !== message.senderId),
-		];
+		if (message.senderId === get(authStore)!.id) {
+			chats = [
+				{
+					user: message.receiver!,
+					lastMessage: message,
+				},
+				...chats.filter((chat) => chat.user.id !== message.receiverId),
+			];
+		} else {
+			chats = [
+				{
+					user: message.sender!,
+					lastMessage: message,
+				},
+				...chats.filter((chat) => chat.user.id !== message.senderId),
+			];
+		}
 		searchChats = chats;
-
 		const lastChat = currentChat;
 
 		if (lastChat.user.id === message.senderId) {
 			currentChat = chats[0];
+		}
+	}
+
+	onDestroy(() => {
+		if (connection) {
+			connection.off("ReceiveMessage", reciveMessageLayout);
+			connection.stop();
+		}
+	});
+
+	$: if ($page.params.email) {
+		const chat = searchChats.find(
+			(chat) => chat.user.id === $page.params.email
+		);
+		if (chat) {
+			currentChat = chat;
 		}
 	}
 
@@ -99,13 +109,7 @@
 		connection.on("ReceiveMessage", reciveMessageLayout);
 	}
 
-	onDestroy(() => {
-		if (connection) {
-			connection.off("ReceiveMessage", reciveMessageLayout);
-		}
-	});
-
-	let toggleSideBar = true;
+	populateChats();
 </script>
 
 <div
@@ -142,13 +146,16 @@
 		<!-- Header -->
 		<header class="border-b border-surface-500/30 p-4 flex flex-col gap-2">
 			<div class="flex flex-row items-center justify-between gap-2">
-				<span class="flex-1 text-secondary-800-100-token" >
-					{ $authStore?.email }
+				<span class="flex-1 text-secondary-800-100-token">
+					{$authStore?.email}
 				</span>
-				<button class="btn variant-soft-error" on:click={() => {
-					authStore.set(null);
-					goto("/");
-				}}>
+				<button
+					class="btn variant-soft-error"
+					on:click={() => {
+						authStore.set(null);
+						goto("/");
+					}}
+				>
 					Logout
 				</button>
 			</div>
@@ -197,7 +204,11 @@
 	</div>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div class="contents" on:click={() => (toggleSideBar = true)} bind:this={elmSlot}>
+	<div
+		class="contents"
+		on:click={() => (toggleSideBar = true)}
+		bind:this={elmSlot}
+	>
 		<slot />
 	</div>
 </div>
