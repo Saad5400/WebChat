@@ -1,8 +1,8 @@
+using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebChat;
 using WebChat.Data;
@@ -62,13 +62,29 @@ builder.Services.AddCors(options =>
     });
 });
 
+// OutputCache
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(builder => builder.Expire(TimeSpan.FromDays(1)));
+});
+
 // SignalR
 builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions()
+{
+    HttpsCompression = Microsoft.AspNetCore.Http.Features.HttpsCompressionMode.Compress,
+    OnPrepareResponse = ctx =>
+    {
+        // Cache
+        ctx.Context.Response.Headers.Append("Cache-Control", $"public,max-age={1 * 60 * 60 * 24}");
+        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddDays(1).ToString("R", CultureInfo.InvariantCulture));
+    }
+}).UseOutputCache();
 app.UseCors();
+app.UseOutputCache();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -182,7 +198,7 @@ messages.MapPost("/", async (AppDbContext db, Message message, ClaimsPrincipal u
 
 // return index.html
 // app.MapGet("/", () => Results.Content(File.ReadAllText("wwwroot/index.html"), "text/html"));
-app.MapFallbackToFile("index.html");
+app.MapFallbackToFile("index.html").CacheOutput();
 
 using (var scope = app.Services.CreateScope())
 {
