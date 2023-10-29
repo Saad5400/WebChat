@@ -6,22 +6,10 @@
     import loadingStore from "$lib/stores/loadingStore.store";
     import redirectStore from "$lib/stores/redirectStore.store";
     import { get } from "svelte/store";
-    import isEmail from "validator/es/lib/isEmail";
-    import isStrongPassword from "validator/es/lib/isStrongPassword";
-
-    const minInputLength = 1;
 
     let email = "";
     let password = "";
     let errorMessage = "";
-
-    $: validEmail = isEmail(email);
-    $: validPassword = isStrongPassword(password, {
-        minLowercase: 0,
-        minUppercase: 0,
-        minNumbers: 0,
-        minSymbols: 0,
-    });
 
     // scrolling
     let y = 0;
@@ -60,43 +48,42 @@
     const registerSubmit = async (e: Event) => {
         e.preventDefault();
         loadingStore.set(true);
-        if (validEmail && validPassword) {
-            const authRes = await register(email, password);
+        const authRes = await register(email, password);
 
-            if (authRes.ok === false) {
-                errorMessage = "Invalid credentials";
-                return;
-            }
-
-            const authData = await authRes.json();
-
-            authStore.set({
-                accessToken: authData.accessToken,
-                refreshToken: authData.refreshToken,
-            });
-
-            const userRes = await getUsers(email);
-
-            if (userRes.ok === false) {
-                errorMessage = "Something went wrong";
-                return;
-            }
-
-            const userData: User[] = await userRes.json();
-
-            const user = userData[0];
-
-            authStore.set({
-                accessToken: authData.accessToken,
-                refreshToken: authData.refreshToken,
-                id: user.id,
-                email: user.email,
-            });
-
-            const redirectUrl = get(redirectStore) || "/chats";
-            redirectStore.set("");
-            goto(redirectUrl);
+        if (authRes.ok === false) {
+            errorMessage = "Invalid credentials";
+            return;
         }
+
+        const authData = await authRes.json();
+
+        authStore.set({
+            accessToken: authData.accessToken,
+            refreshToken: authData.refreshToken,
+        });
+
+        const userRes = await getUsers(email);
+
+        if (userRes.ok === false) {
+            errorMessage = "Something went wrong";
+            return;
+        }
+
+        const userData: User[] = await userRes.json();
+
+        const user = userData[0];
+
+        authStore.set({
+            accessToken: authData.accessToken,
+            refreshToken: authData.refreshToken,
+            id: user.id,
+            email: user.email,
+        });
+
+        const redirectUrl = get(redirectStore) || "/chats";
+        redirectStore.set("");
+        goto(redirectUrl);
+
         loadingStore.set(false);
     };
 </script>
@@ -145,11 +132,8 @@
                     type="email"
                     name="email"
                     class="input variant-form-material"
-                    class:input-error={email?.length >= minInputLength &&
-                        !validEmail}
                     bind:value={email}
                     required
-                    minlength={minInputLength}
                     on:focus={() => {
                         errorMessage = "";
                     }}
@@ -162,8 +146,7 @@
                     type="password"
                     name="password"
                     class="input variant-form-material"
-                    class:input-error={password?.length >= minInputLength &&
-                        !validPassword}
+                    min="8"
                     bind:value={password}
                     required
                     minlength="8"
