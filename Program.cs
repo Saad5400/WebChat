@@ -79,12 +79,16 @@ app.UseStaticFiles(new StaticFileOptions()
     OnPrepareResponse = ctx =>
     {
         // Cache
-        ctx.Context.Response.Headers.Append("Cache-Control", $"public,max-age={1 * 60 * 60 * 24}");
-        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddDays(1).ToString("R", CultureInfo.InvariantCulture));
+        if (!app.Environment.IsDevelopment())
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", $"public,max-age={1 * 60 * 60 * 24}");
+            ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddDays(1).ToString("R", CultureInfo.InvariantCulture));
+        }
     }
 });
 app.UseCors();
-app.UseOutputCache();
+if (!app.Environment.IsDevelopment())
+    app.UseOutputCache();
 app.UseAuthentication();
 app.UseAuthorization();
 

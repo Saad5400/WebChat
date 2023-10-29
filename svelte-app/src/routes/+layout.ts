@@ -4,7 +4,7 @@ import { redirect, type Load } from "@sveltejs/kit";
 import { get } from "svelte/store";
 
 export const ssr = true;
-export const prerender = false;
+export const prerender = true;
 
 export const load: Load = async ({ url }) => {
     // If the user is LOGGED IN
@@ -22,6 +22,6 @@ export const load: Load = async ({ url }) => {
             redirectStore.set(url.pathname);
             throw redirect(302, "/");
         }
-        
+
     }
 };
